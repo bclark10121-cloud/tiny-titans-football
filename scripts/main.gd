@@ -239,6 +239,8 @@ func _setup_input() -> void:
 	_action("switch", [_key(KEY_TAB), _joy(JOY_BUTTON_LEFT_SHOULDER)])
 	_action("hot", [_joy(JOY_BUTTON_RIGHT_SHOULDER)])
 	_action("menu", [_key(KEY_ESCAPE), _joy(JOY_BUTTON_START), _joy(JOY_BUTTON_BACK)])
+	# Godot 4.6 binds no controller button to screen buttons. A presses the highlighted button (Start, teams, play cards, Menu)
+	_action("ui_accept", [_joy(JOY_BUTTON_A)])
 	_action("pass_1", [_key(KEY_1), _joy(JOY_BUTTON_A)])
 	_action("pass_2", [_key(KEY_2), _joy(JOY_BUTTON_B)])
 	_action("pass_3", [_key(KEY_3), _joy(JOY_BUTTON_X)])
@@ -991,6 +993,7 @@ func setup_play() -> void:
 func _begin_presnap() -> void:
 	state = St.PRESNAP
 	snap_queued = false
+	just.clear()  # the A or Enter press that picked the play must not also snap it
 	presnap_t = 0.0
 	meter_t = 0.0
 	kicked = false
