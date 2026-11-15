@@ -58,6 +58,10 @@ var throw_row: HBoxContainer
 var throw_btns: Array[Button] = []
 var throw_labels: PackedStringArray = PackedStringArray()
 var diff_btns: Array[Button] = []
+var mode_btns: Array[Button] = []
+var game_mode: int = 7  # players a side picked on the team screen
+var active_off: Array[String] = []  # roles on the field this game: diagrams draw only these
+var active_def: Array[String] = []
 var difficulty: int = 1
 var practice_box: CheckBox
 
@@ -281,6 +285,15 @@ func apply_safe_area(fake: int) -> void:
 	safe.offset_right = -r
 	safe.offset_bottom = -b
 
+func set_mode(m: int) -> void:
+	game_mode = m
+	for b: Button in mode_btns:
+		b.set_pressed_no_signal(b.text.begins_with("%d " % m))
+
+func active_on(role: String, off: bool) -> bool:
+	var list: Array[String] = active_off if off else active_def
+	return list.is_empty() or list.has(role)
+
 func set_auto_pass(on: bool) -> void:
 	# keeps the team screen box and the Menu button in step with the saved setting
 	if auto_box:
@@ -391,6 +404,21 @@ func _build_team(teams: Array) -> void:
 		db.pressed.connect(func() -> void: difficulty = i)
 		dr.add_child(db)
 		diff_btns.append(db)
+	var mr := HBoxContainer.new()
+	mr.alignment = BoxContainer.ALIGNMENT_CENTER
+	mr.add_theme_constant_override("separation", 10)
+	v.add_child(mr)
+	mr.add_child(_lbl("Players:", 20))
+	var mgroup := ButtonGroup.new()
+	for m: int in [7, 11]:
+		var mb := _btn("%d on %d" % [m, m], 20)
+		mb.toggle_mode = true
+		mb.button_group = mgroup
+		mb.custom_minimum_size = Vector2(120, 48)
+		mb.button_pressed = m == game_mode
+		mb.pressed.connect(func() -> void: menu_action.emit("mode%d" % m))
+		mr.add_child(mb)
+		mode_btns.append(mb)
 	practice_box = CheckBox.new()
 	practice_box.text = "Practice mode (offense only, no clock, no score)"
 	practice_box.add_theme_font_size_override("font_size", 20)
@@ -742,7 +770,7 @@ class Diagram extends Control:
 			var form: Dictionary = hud.formations.get(String(play.get("formation", "gun")), {})
 			var routes: Dictionary = play.get("routes", {})
 			for r: String in form:
-				if r == "name":
+				if r == "name" or (not hud.active_on(r, true)):
 					continue
 				var a: Array = form[r]
 				var p: Vector2 = _pt(float(a[0]), float(a[1]))
@@ -776,6 +804,8 @@ class Diagram extends Control:
 			var jobs: Dictionary = play.get("jobs", {})
 			var align: Dictionary = play.get("align", {})
 			for r: String in hud.dformation:
+				if not hud.active_on(r, false):
+					continue
 				var a2: Array = align.get(r, hud.dformation[r])
 				var p2: Vector2 = _pt(float(a2[0]), float(a2[1]))
 				var job: String = String(jobs.get(r, "rush"))

@@ -10,8 +10,11 @@ const GOAL: float = 50.0
 const END: float = 60.0
 const QLEN: float = 120.0
 const SAVE_PATH: String = "user://tiny_titans.json"
-const OFF_ROLES: Array[String] = ["LT", "LG", "C", "RG", "RT", "QB", "RB", "TE", "WR1", "WR2", "WR3"]
-const DEF_ROLES: Array[String] = ["DE1", "DT1", "DT2", "DE2", "LB2", "LB1", "LB3", "S1", "CB1", "CB2", "S2"]
+# The first 7 roles on each side play in 7 on 7 (Brian, 2026-11-15): 3 linemen, QB, RB and 2 WR against 3 linemen,
+# 2 linebackers and 2 defensive backs. 11 on 11 adds the last 4.
+const OFF_ROLES: Array[String] = ["LG", "C", "RG", "QB", "RB", "WR1", "WR2", "LT", "RT", "TE", "WR3"]
+const DEF_ROLES: Array[String] = ["DE1", "DT1", "DE2", "LB1", "LB2", "CB1", "CB2", "DT2", "LB3", "S1", "S2"]
+const BIG_ROLES: Array[String] = ["LT", "LG", "C", "RG", "RT", "DE1", "DT1", "DT2", "DE2"]
 const SPEED: Dictionary = {"QB": 7.8, "RB": 9.0, "TE": 8.3, "WR1": 9.4, "WR2": 9.4, "WR3": 9.2, "LT": 6.2, "LG": 6.2, "C": 6.2, "RG": 6.2, "RT": 6.2,
 	"DE1": 7.4, "DE2": 7.4, "DT1": 6.8, "DT2": 6.8, "LB1": 8.7, "LB2": 8.6, "LB3": 8.7, "CB1": 9.55, "CB2": 9.55, "S1": 9.4, "S2": 9.3}
 const NUMBERS: Dictionary = {"LT": 72, "LG": 64, "C": 55, "RG": 66, "RT": 78, "QB": 12, "RB": 28, "TE": 88, "WR1": 11, "WR2": 84, "WR3": 17,
@@ -62,7 +65,8 @@ var first_z: float = -15.0
 var quarter: int = 1
 var clock: float = QLEN
 var opening_kicker: int = 0
-var players: Array[Array] = [[], []]
+var players: Array[Array] = [[], []]  # the players on the field this game: 7 or 11 a side
+var squad: Array[Array] = [[], []]  # all 11 player objects a side. In 7 on 7 the last 4 sit out, hidden
 var roles: Array[Dictionary] = [{}, {}]
 var off_play: Dictionary = {}
 var def_play: Dictionary = {}
@@ -532,6 +536,7 @@ func _apply_sound() -> void:
 	AudioServer.set_bus_mute(0, not bool(save.sound))
 	if hud and hud.sound_btn:
 		hud.sound_btn.text = "Sound: On" if bool(save.sound) else "Sound: Off"
+		hud.set_mode(int(save.get("mode", 7)))
 		hud.set_auto_pass(bool(save.get("auto_pass", false)))
 
 func _load_save() -> void:
@@ -557,6 +562,7 @@ func _spawn_players() -> void:
 			p.team = side
 			p.idx = i
 			add_child(p)
+			squad[side].append(p)
 			players[side].append(p)
 			all.append(p)
 	view = SquadView.new()
@@ -617,7 +623,46 @@ func _on_start() -> void:
 	state = St.TEAMSEL
 	hud.show_screen("team")
 
+func _apply_mode() -> void:
+	# 7 on 7 or 11 on 11: the players past the mode sit out of the game, hidden below the field.
+	for side: int in 2:
+		players[side].clear()
+		for i: int in squad[side].size():
+			var p: TTPlayer = squad[side][i]
+			var on: bool = i < mode
+			p.visible = on
+			if on:
+				players[side].append(p)
+			else:
+				p.position = Vector3(0.0, -40.0, 0.0)
+				p.set_tag("")
+
+func _fit_play(p: Dictionary) -> Dictionary:
+	# 7 on 7 passes go to the 2 WR and the RB. Receivers who sit out drop off the play, and the RB runs a swing route.
+	if mode == 11 or String(p.get("type", "")) != "pass":
+		return p
+	var q: Dictionary = p.duplicate(true)
+	var keep: Array = []
+	for t: Variant in (q.targets as Array):
+		if OFF_ROLES.find(String(t)) < mode:
+			keep.append(t)
+	if not keep.has("RB"):
+		keep.append("RB")
+	q.targets = keep
+	var routes: Dictionary = q.get("routes", {})
+	if not routes.has("RB"):
+		var form: Dictionary = (plays.formations as Dictionary).get(String(q.formation), {})
+		var rb: Array = form.get("RB", [0, -6])
+		var sx: float = -1.0 if float(rb[0]) < 0.0 else 1.0
+		routes["RB"] = {"pts": [[sx * 5.0, -2.0], [sx * 9.0, 3.0]]}
+		q.routes = routes
+	return q
+
 func start_game(team: int, practice_mode: bool, difficulty: int) -> void:
+	mode = 11 if (mode_arg == "11" or (mode_arg == "" and not bot and int(save.get("mode", 7)) == 11)) else 7
+	_apply_mode()
+	hud.active_off = OFF_ROLES.slice(0, mode)
+	hud.active_def = DEF_ROLES.slice(0, mode)
 	practice = practice_mode
 	team_idx[0] = team
 	var others: Array[int] = []
@@ -773,7 +818,7 @@ func goto_playcall() -> void:
 		var order := PackedStringArray(["Short", "Deep", "Run", "Option"])
 		for p: Dictionary in plays.offense:
 			var cat: String = String(p.cat)
-			(t[cat.capitalize()] as Array).append(_card(p, "off"))
+			(t[cat.capitalize()] as Array).append(_card(_fit_play(p), "off"))
 		var kicks: Array = []
 		if not practice and not conversion:
 			if down_n == 4:
@@ -939,10 +984,11 @@ func _place_formation() -> void:
 	var dform: Dictionary = _def_form()
 	var align: Dictionary = def_play.get("align", {})
 	var jobs: Dictionary = def_play.get("jobs", {})
-	for i: int in 11:
+	for i: int in players[poss].size():
 		var o: TTPlayer = players[poss][i]
 		o.reset_play()
 		o.role = OFF_ROLES[i]
+		o.big = 1.2 if BIG_ROLES.has(o.role) else 1.0
 		o.side = "off"
 		roles[poss][o.role] = o
 		var a: Array = oform[o.role]
@@ -952,9 +998,10 @@ func _place_formation() -> void:
 		var q: TTPlayer = players[1 - poss][i]
 		q.reset_play()
 		q.role = DEF_ROLES[i]
+		q.big = 1.2 if BIG_ROLES.has(q.role) else 1.0
 		q.side = "def"
 		roles[1 - poss][q.role] = q
-	for i: int in 11:
+	for i: int in players[1 - poss].size():
 		var q2: TTPlayer = players[1 - poss][i]
 		var b: Array = align.get(q2.role, dform[q2.role])
 		var pos: Vector3 = fw(float(b[0]), float(b[1]))
@@ -996,6 +1043,7 @@ func _place_formation() -> void:
 	cam_focus = Vector3(ball_x, 0.0, los)
 
 func setup_play() -> void:
+	off_play = _fit_play(off_play)
 	_place_formation()
 	_begin_presnap()
 
@@ -1115,7 +1163,7 @@ func _audible_options() -> Array[Dictionary]:
 	return out
 
 func _apply_audible(p: Dictionary) -> void:
-	off_play = p
+	off_play = _fit_play(p)
 	audible_open = false
 	_place_formation()
 	hot_routes.clear()
@@ -1251,8 +1299,14 @@ func snap() -> void:
 		if j == "rush" or j == "spy":
 			q.job = j
 		elif j.begins_with("man:"):
-			q.job = "man"
-			q.man = R(poss, j.substr(4))
+			var m: TTPlayer = R(poss, j.substr(4))
+			if m == null:
+				# 7 on 7: his man sits out, so he covers a short zone in front of where he lined up
+				q.job = "zone"
+				q.zone_spot = Vector3(q.position.x, 0.0, los + 7.0 * dirv(poss))
+			else:
+				q.job = "man"
+				q.man = m
 		else:
 			q.job = "zone"
 			var zz: PackedStringArray = j.substr(5).split(",")
@@ -1282,7 +1336,9 @@ func _snap_kick() -> void:
 		for g: String in ["WR1", "WR2"]:
 			R(poss, g).job = "cover"
 		for r: String in ["DE1", "DT1", "DT2", "DE2"]:
-			R(1 - poss, r).job = "rush"
+			var rusher: TTPlayer = R(1 - poss, r)
+			if rusher != null:  # DT2 sits out in 7 on 7
+				rusher.job = "rush"
 		var c: TTPlayer = R(poss, "C")
 		ball_from = c.position + Vector3(0.0, 0.5, 0.0)
 		ball_to = kicker.position
@@ -1462,6 +1518,10 @@ func _on_menu(action: String) -> void:
 		"sound":
 			save.sound = not bool(save.sound)
 			_apply_sound()
+			_write_save()
+		"mode7", "mode11":
+			save.mode = 7 if action == "mode7" else 11
+			hud.set_mode(int(save.mode))
 			_write_save()
 		"autopass":
 			save.auto_pass = not bool(save.get("auto_pass", false))

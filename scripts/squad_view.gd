@@ -186,6 +186,9 @@ func refresh() -> void:
 		var i: int = p.view_i
 		var w: float = p.big
 		var root := Transform3D(Basis(Vector3.UP, p.rotation.y), p.position)
+		if not p.visible:
+			# sitting out (7 on 7): squash every part to nothing
+			root = Transform3D(Basis().scaled(Vector3.ZERO), p.position)
 		var body: Transform3D = root * Transform3D(Basis(Vector3.RIGHT, p.lean), Vector3(0.0, p.body_y, 0.0))
 		for k: int in 2:
 			var sx: float = -1.0 if k == 0 else 1.0
