@@ -13,8 +13,8 @@ Note: this game has an opponent and a final score. `STANDARDS_OVERRIDES.md` reco
 
 ## Rules
 
-- Read `handoff/STANDARDS.md` (the standards for every game Brian makes), then `STANDARDS_OVERRIDES.md` (where this game differs). Order of authority: Brian in the chat, then the overrides, then the standards.
-- A new shared standard from Brian goes in `handoff/STANDARDS.md`. A football-only exception goes in `STANDARDS_OVERRIDES.md` as `Proposed` until Brian approves it.
+- Read `handoff/GAME_STANDARDS.md` (rule ids start with G), then `handoff/ENGINEERING_STANDARDS.md` once it is in the repo (rule ids start with E), then `STANDARDS_OVERRIDES.md` (where this game differs). Order of authority: Brian in the chat, then the overrides, then the standards.
+- Never edit a standards file in this repo. Propose a new standard to Brian. A football-only exception goes in `STANDARDS_OVERRIDES.md` as `Proposed` until Brian approves it.
 - Do not sync the standards into other game repos unless Brian asks.
 - Top menu: one Menu button at the top right opens all options in a row across the top.
 - This repo is public. Never commit a signing key, keystore or password.
@@ -35,11 +35,11 @@ Note: this game has an opponent and a final score. `STANDARDS_OVERRIDES.md` reco
 4. The backlog: `BACKLOG.md`, updated, linked and sent to Brian as a file.
 5. `docs/index.html` updated: version line, APK link and what is new. Add `docs/release-notes/v<version>.md` with a test checklist.
 6. The browser build goes in `docs/play/`.
-7. The game standards handoff zip: update `handoff/STANDARDS.md` and `STANDARDS_OVERRIDES.md`, run `tools/make_handoff.sh` and send `Game_Standards_handoff.zip` to Brian as a file.
+7. The game standards handoff zip: update `STANDARDS_OVERRIDES.md`, run `tools/make_handoff.sh` and send `Game_Standards_handoff.zip` to Brian as a file.
 
 ## Open item: Android signing
 
-v0.1.0 is signed with a throwaway test key. Brian's key `wandervalley.jks` lives in a private repo and was not reachable when v0.1.0 was built. Brian chose to keep the test key for now (2026-11-14, override 6.3). Once the real key is used, testers must uninstall v0.1.0 first.
+v0.1.0 is signed with a throwaway test key. Brian's key `wandervalley.jks` lives in a private repo and was not reachable when v0.1.0 was built. Brian chose to keep the test key for now (2026-11-14, override G6.3). Once the real key is used, testers must uninstall v0.1.0 first.
 
 ## Reporting to Brian
 

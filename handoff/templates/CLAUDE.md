@@ -1,7 +1,7 @@
 # <Game Name>: project rules
 
 <Game Name> is Brian Clark's <one line>. Godot 4.6, Android and browser. This repo is public.
-Read `handoff/STANDARDS.md` first. It holds the standards for every game. Then read `STANDARDS_OVERRIDES.md` for where this game differs.
+Read `handoff/GAME_STANDARDS.md` first. It holds the standards for every game. Then read `STANDARDS_OVERRIDES.md` for where this game differs.
 
 ## Pillars (never break these)
 
