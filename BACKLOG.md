@@ -22,7 +22,7 @@ Updated 2026-11-15. Brian decides the order.
 
 ## Next
 
-- v0.2.0: 7 on 7 becomes the default game. 11 on 11 stays as a choice. Plus the option plays already built in the v0.2.0 work (decided by Brian 2026-11-15).
+- v0.2.0: 7 on 7 becomes the default game. 11 on 11 stays as a choice. Full controller support: A presses on-screen buttons (fixed in the v0.2.0 work). Plus the option plays already built in the v0.2.0 work (decided by Brian 2026-11-15).
 - v0.3.0: the 2 second burst button.
 
 ## Asked for by Brian, not built yet
@@ -77,6 +77,7 @@ Updated 2026-11-15. Brian decides the order.
 - 2026-11-14: One source. The standards live only in the private repo `game-standards`. The shared kit is pulled into this repo with `sync_common.sh`. The signing key lives in the private repo `game-signing`.
 - 2026-11-15: 7 on 7 is the default game in v0.2.0 and 11 on 11 stays a choice. Option plays ship in v0.2.0. The 2 second burst button comes in v0.3.0.
 - 2026-11-15: 7 on 7 offense: 3 linemen, 1 QB, 1 RB and 2 WR. Defense: 3 linemen, 2 linebackers and 2 defensive backs. Full field.
+- 2026-11-15: Controller passing stays on A, B, X and Y, the button shown on each receiver. Shoulder buttons stay for sprint, switch and hot routes.
 
 ## Judgment calls made in v0.1.0 (Brian to confirm or change)
 
