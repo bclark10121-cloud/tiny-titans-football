@@ -1,6 +1,0 @@
-[
-  {"id": "otters", "name": "Ironwood Otters", "abbr": "OTT", "jersey": "1f6f5c", "helmet": "d9c27a", "pants": "f2efe6", "speed": 1.00, "power": 1.03, "hands": 1.00},
-  {"id": "comets", "name": "Harbor City Comets", "abbr": "COM", "jersey": "2a4fb8", "helmet": "f28c28", "pants": "e8ebf2", "speed": 1.03, "power": 0.98, "hands": 1.01},
-  {"id": "rattlers", "name": "Red Mesa Rattlers", "abbr": "RAT", "jersey": "b3261e", "helmet": "1c1c1c", "pants": "d8c9a3", "speed": 0.99, "power": 1.04, "hands": 0.99},
-  {"id": "yetis", "name": "Summit Yetis", "abbr": "YET", "jersey": "e9eef5", "helmet": "5aa9e6", "pants": "34495e", "speed": 1.01, "power": 1.00, "hands": 1.03}
-]

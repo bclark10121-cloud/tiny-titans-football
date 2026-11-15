@@ -1,8 +1,18 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-15 for v0.3.0. Brian decides the order.
+Updated 2026-11-15 for v0.3.1. Brian decides the order.
 
 ## Done
+
+### v0.3.1 (standards release, no new football)
+
+- Debug menu (asked for by Brian, G5.9). Settings shows Tester tools in test builds. A code opens it. Tools: Home score +7, Away score +7, Quarter, Clock to 10 seconds, Final play, New season at week 1, Jump to week 4, Jump to week 6, Jump to the Title Game, Difficulty, Pretend camera notch, Reset the save, Load the test save, a frame rate and memory readout and game speed x1, x2 and x4. A red DEBUG tag shows while it is unlocked. Works with touch, a keyboard or only an Xbox controller.
+- Own app icon set (asked for by Brian, G6.10). One 1024 master. Android launcher icon and adaptive icon set for the first time.
+- Source moved to the private repo (Brian, G1.7). The public repo now holds only the game page, builds, release notes and this backlog.
+- Game page line reads `Version 0.3.1. Release notes · Backlog` (G1.8).
+- Test gate: test what changed (G7.9). The 12 bot games and the bot season no longer run on every release.
+- Shared kit 1.6.0. This game is the pilot for it.
+- Fixed: `project.godot` said version 0.2.0.
 
 ### v0.3.0
 
