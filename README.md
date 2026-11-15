@@ -16,11 +16,12 @@ v0.1.0, first test build: one exhibition game against the computer, 8 offensive 
 - `scripts/hud.gd`: scoreboard, Menu button, play cards, kick meter, panels and touch controls.
 - `data/plays.json`: formations, offensive plays and defenses. New plays need no code.
 - `data/teams.json`: the four teams with colors and ratings.
-- `audio/`: music and hit sounds (see CREDITS.md) and stadium sounds made by `tools/make_sfx.py`.
-- `tests/web_test.py`: browser check with screenshots.
+- `audio/`: music and hit sounds (see CREDITS.md) and stadium sounds made by `tools/common/make_sfx.py`.
+- `tests/web_test.py`: browser check with screenshots. It uses the shared helpers in `tests/common/`.
+- `addons/bc_common/`, `tools/common/`, `tests/common/` and `common.lock`: the shared kit, pulled from the private repo `game-standards` (G10). Never edit these here.
 - `docs/`: the GitHub Pages site. Game page at the root, the game in `docs/play/`, APKs in `docs/downloads/`.
 - `BACKLOG.md`: the backlog.
-- `handoff/GAME_STANDARDS.md` and `handoff/ENGINEERING_STANDARDS.md`: the standards shared by every game. Master copies live in the private repo `game-standards`. `STANDARDS_OVERRIDES.md`: where this game differs.
+- `STANDARDS_OVERRIDES.md`: where this game differs from the shared standards. The standards themselves live only in the private repo `game-standards`. This repo holds no copies.
 
 ## Build and test
 
@@ -28,4 +29,7 @@ v0.1.0, first test build: one exhibition game against the computer, 8 offensive 
     godot --headless --path . -- --bot --games=6 --verbose   # the computer plays both sides and prints each game
     godot --headless --path . --export-release Web
     python3 tests/web_test.py <web folder> <shots folder>     # must print: errors []
-    godot --headless --path . --export-release Android
+    bash tools/common/sync_common.sh --check .                # must print: COMMON check ok
+    GODOT=godot bash tools/common/sign_android.sh docs/downloads/TinyTitansFootball-v<version>.apk
+                                                              # needs the private repo game-signing cloned at ../game-signing
+    python3 tests/common/page_check.py https://bclark10121-cloud.github.io/tiny-titans-football/   # after a push

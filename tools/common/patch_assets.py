@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Search the Patch.gg asset library and fetch files. No login needed.
-#   python3 tools/patch_assets.py search music "calm lofi"       lists CC0 hits with size and length
-#   python3 tools/patch_assets.py search sprite "shell"
-#   python3 tools/patch_assets.py get "<asset id>" out_file        downloads the first audio or PNG file of an asset
+#   python3 tools/common/patch_assets.py search music "calm lofi"       lists CC0 hits with size and length
+#   python3 tools/common/patch_assets.py search sprite "shell"
+#   python3 tools/common/patch_assets.py get "<asset id>" out_file        downloads the first audio or PNG file of an asset
 # After fetching: re-encode music with ffmpeg (-c:a libvorbis -q:a 2.5), check pictures by eye and add each asset to CREDITS.md.
 import json, sys, urllib.parse, urllib.request
 API = "https://patch.gg/api/v1/assets/"

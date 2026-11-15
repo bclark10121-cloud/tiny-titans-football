@@ -15,7 +15,7 @@ Tiny Titans Football is made by Brian Clark. Teams, plays, players, stadium and 
 
 ## Made for this game
 
-- Whistle, crowd, cheer, kick and click sounds: made by `tools/make_sfx.py`.
+- Whistle, crowd, cheer, kick and click sounds: made by `tools/common/make_sfx.py` from the shared kit.
 - Player models, field, stadium and icon: made in code.
 
 ## Tools

@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-# Makes the stadium sounds with a small synth: whistle, crowd loop, cheer and kick. Needs numpy and ffmpeg.
-# Output: audio/whistle.ogg, crowd.ogg, cheer.ogg, kick.ogg, click.ogg
+# Shared sound maker (common). Makes stadium sounds with a small synth: whistle, crowd loop, cheer, kick and click.
+# Needs numpy and ffmpeg. usage: python3 tools/common/make_sfx.py [output folder, default ./audio]
+# Output: whistle.ogg, crowd.ogg, cheer.ogg, kick.ogg, click.ogg (mono, 32 kHz). E6.3 asks for .wav: see common/CHANGELOG.md.
 import numpy as np, os, wave, subprocess
 SR = 32000
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "audio")
+import sys
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.getcwd(), "audio")
+os.makedirs(OUT, exist_ok=True)
 rng = np.random.default_rng(7)
 def lowpass(x, k):
     c = np.cumsum(np.insert(x, 0, 0.0)); return (c[k:] - c[:-k]) / k

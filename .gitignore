@@ -4,3 +4,5 @@
 *.jks
 *.keystore
 !docs/downloads/*.apk
+__pycache__/
+*.pyc
