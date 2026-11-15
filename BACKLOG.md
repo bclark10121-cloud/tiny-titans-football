@@ -1,8 +1,15 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-15 for v0.3.1. Brian decides the order.
+Updated 2026-11-15 for v0.3.2. Brian decides the order.
 
 ## Done
+
+### v0.3.2 (standards release: Settings and save slots)
+
+- One Settings menu, the same in every game from now on (asked for by Brian, G5.11). Music and Sound in five levels. Full screen in the browser. Frame rate number. Rumble. Then Auto pass, Players, Quarter length and Controls. Then Text size and Reset settings. Every change saves by itself. No Save button.
+- Five save slots (asked for by Brian, G5.12). A Slot button on the title card opens the list. Each slot has its own record, season and saved game. Delete on every used slot, with a second press. Your save from v0.3.1 is now slot 1.
+- Settings are kept apart from the slots, so deleting a slot never changes them.
+- Shared kit 1.7.0. This game is the pilot for it.
 
 ### v0.3.1 (standards release, no new football)
 
