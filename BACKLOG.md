@@ -1,6 +1,6 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-14 for v0.1.0. Brian decides the order.
+Updated 2026-11-15. Brian decides the order.
 
 ## Done
 
@@ -23,6 +23,10 @@ Updated 2026-11-14 for v0.1.0. Brian decides the order.
 ## Asked for by Brian, not built yet
 
 1. Player models from Patch.gg. v0.1.0 uses players built in code. Patch.gg has no American football player model.
+2. Better character design (2026-11-15). Players that look more like football players: helmet, pads, jersey and number. Goes with item 1. v0.2.0 adds jersey numbers and bigger linemen.
+3. 7 on 7 option (2026-11-15). A quicker game mode with 7 players a side. It was idea 9.
+4. Option plays (2026-11-15). Built in the v0.2.0 work, not released yet: Speed Option Right and Left, Pistol Option, Zone Read and Zone Read Left, with a pitch button.
+5. Button to run faster (2026-11-15). Sprint works today: hold Space or Shift on a keyboard, A or RT on a controller, or the A button on touch. Brian to confirm what he wants changed: a clearer touch button, a stronger burst or a stamina meter.
 
 ## Ideas to choose from (Brian picks by number)
 
@@ -34,17 +38,16 @@ Updated 2026-11-14 for v0.1.0. Brian decides the order.
 6. Difficulty levels and gameplay sliders.
 7. Season mode with standings and a playoff.
 8. Team and uniform editor.
-9. 7 on 7 quick-play option.
-10. Weather and night games.
-11. Instant replay.
-12. Two players on one device.
-13. Fatigue and substitutions.
-14. Play designer.
-15. Jersey numbers, a kicker and a holder on kicks, sideline players and referees.
-16. Spectate mode (computer against computer).
-17. Two-point conversions and overtime.
-18. More music from Patch.gg for menus and halftime.
-19. Throw power: tap for a lob, hold for a bullet pass.
+9. Weather and night games.
+10. Instant replay.
+11. Two players on one device.
+12. Fatigue and substitutions.
+13. Play designer.
+14. Jersey numbers, a kicker and a holder on kicks, sideline players and referees.
+15. Spectate mode (computer against computer).
+16. Two-point conversions and overtime.
+17. More music from Patch.gg for menus and halftime.
+18. Throw power: tap for a lob, hold for a bullet pass.
 
 ## Later
 
