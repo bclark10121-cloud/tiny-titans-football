@@ -202,7 +202,8 @@ func refresh() -> void:
 		_put(helmet, i, body * _bx(Vector3(0.74, 0.7, 0.8), Vector3(0.0, 2.08, 0.0)))
 		_put(stripe, i, body * _bx(Vector3(0.12, 0.74, 0.84), Vector3(0.0, 2.1, 0.0)))
 		_put(mask, i, body * _bx(Vector3(0.5, 0.12, 0.12), Vector3(0.0, 1.98, 0.43)))
-		_put(shadow, i, Transform3D(Basis(Vector3.UP, p.rotation.y).scaled(Vector3(1.1, 0.04, 1.1)), Vector3(p.position.x, 0.08, p.position.z)))
+		var shadow_scale: Vector3 = Vector3(1.1, 0.04, 1.1) if p.visible else Vector3.ZERO  # no shadow for a player sitting out
+		_put(shadow, i, Transform3D(Basis(Vector3.UP, p.rotation.y).scaled(shadow_scale), Vector3(p.position.x, 0.08, p.position.z)))
 		var wide := Transform3D(Basis.from_scale(Vector3(w, 1.0, 1.0)), Vector3.ZERO)
 		_put(number, i * 2, body * wide * back)
 		_put(number, i * 2 + 1, body * wide * front)
