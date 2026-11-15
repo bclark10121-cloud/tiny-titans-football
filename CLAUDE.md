@@ -1,6 +1,6 @@
 # Tiny Titans Football: project rules
 
-Tiny Titans Football is Brian Clark's arcade football game. Godot 4.6, Android and browser. This repo is public.
+Tiny Titans Football is Brian's arcade football game. Godot 4.6, Android and browser. This repo is public.
 
 ## Standards (G0.10, G10)
 

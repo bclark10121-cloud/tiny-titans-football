@@ -1,6 +1,6 @@
 # Credits
 
-Tiny Titans Football is made by Brian Clark. Teams, plays, players, stadium and interface are original and built in code.
+Tiny Titans Football is made by Brian. Teams, plays, players, stadium and interface are original and built in code.
 
 ## Music (found through the Patch.gg asset library)
 
