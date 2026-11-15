@@ -1,8 +1,18 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-15 for v0.3.2. Brian decides the order.
+Updated 2026-11-15 for v0.3.3. Brian decides the order.
 
 ## Done
+
+### v0.3.3 (standards release: the rules agreed on 2026-11-15)
+
+- Hints follow the device used last: keys, Xbox buttons or touch buttons. The title card shows that device's controls only (G5.14).
+- The game pauses when the controller in use disconnects (G5.15).
+- The Menu reads Resume, Settings, How to play, Restart, Title (G5.16).
+- Copy bug report in Tester tools (G5.10).
+- Privacy page. No internet permission in the APK (G6.13).
+- A GitHub Release with the APK for every version. The game page keeps the newest two APKs (G2.10, G1.12).
+- Shared kit 1.8.0. This game is the pilot for it.
 
 ### v0.3.2 (standards release: Settings and save slots)
 
