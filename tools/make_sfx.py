@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-# Makes the stadium sounds with a small synth: whistle, crowd loop, cheer and kick. Needs numpy and ffmpeg.
-# Output: audio/whistle.ogg, crowd.ogg, cheer.ogg, kick.ogg, click.ogg
+# Makes the stadium sounds with a small synth. Needs numpy and ffmpeg.
+# Standard E6.3: short effects are mono .wav at 32 kHz. The crowd loop is ambient, so it is .ogg.
+# Output: audio/whistle.wav, cheer.wav, kick.wav, click.wav and audio/crowd.ogg
 import numpy as np, os, wave, subprocess
 SR = 32000
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "audio")
@@ -10,11 +11,15 @@ def lowpass(x, k):
 def noise_band(n, lo, hi):
     f = np.fft.rfft(rng.standard_normal(n)); fr = np.fft.rfftfreq(n, 1 / SR)
     f[(fr < lo) | (fr > hi)] = 0; x = np.fft.irfft(f, n); return x / np.max(np.abs(x))
-def write(name, buf):
-    p = os.path.join(OUT, name + ".wav")
-    with wave.open(p, "wb") as w:
+def write_wav(path, buf):
+    with wave.open(path, "wb") as w:
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((np.clip(buf, -1, 1) * 30000).astype("<i2").tobytes())
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", p, "-c:a", "libvorbis", "-q:a", "3", os.path.join(OUT, name + ".ogg")], check=True); os.remove(p)
+def write(name, buf, ogg=False):
+    p = os.path.join(OUT, name + ".wav")
+    write_wav(p, buf)
+    if ogg:
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", p, "-c:a", "libvorbis", "-b:a", "96k", os.path.join(OUT, name + ".ogg")], check=True)
+        os.remove(p)
 def whistle(dur):
     t = np.arange(int(SR * dur)) / SR
     trill = 1 + 0.25 * np.sign(np.sin(2 * np.pi * 38 * t))
@@ -39,5 +44,5 @@ def kick():
 def click():
     t = np.arange(int(SR * 0.06)) / SR
     return np.sin(2 * np.pi * 900 * t) * np.exp(-t * 70) * 0.5
-write("whistle", whistle(0.55)); write("crowd", crowd(8.0)); write("cheer", crowd(3.5, True)); write("kick", kick()); write("click", click())
+write("whistle", whistle(0.55)); write("cheer", crowd(3.5, True)); write("kick", kick()); write("click", click()); write("crowd", crowd(8.0), ogg=True)
 print("sounds written to", OUT)
