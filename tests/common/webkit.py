@@ -11,11 +11,29 @@
 
 The game publishes window.<name> with at least a "phase" field (test_bridge.gd). A failed check or a page error
 lands in r.errs, so a test passes only when it prints errors [].
+
+Pretend Xbox controller (G5.8). Call use_pad() before open(). Buttons use the Xbox names in PAD_BUTTONS:
+    await r.use_pad(); await r.open(url)
+    await r.pad("A"); await r.pad("DOWN"); await r.pad("VIEW")      # press and release
+    await r.pad_stick(1.0, 0.0, 2000)                                 # hold the left stick right for 2 seconds
+Headless Chrome draws only 1 or 2 frames a second, so presses are held long enough for the game to see them.
 """
 import asyncio, contextlib, os, subprocess, sys, time
 from playwright.async_api import async_playwright
 
 CHROME = os.environ.get("CHROME", "/usr/bin/google-chrome")
+# Xbox button names to the browser's standard gamepad layout (G5.8). View is Back and Menu is Start in Godot.
+PAD_BUTTONS = {"A": 0, "B": 1, "X": 2, "Y": 3, "LB": 4, "RB": 5, "LT": 6, "RT": 7, "VIEW": 8, "MENU": 9,
+               "LS": 10, "RS": 11, "UP": 12, "DOWN": 13, "LEFT": 14, "RIGHT": 15, "XBOX": 16}
+# Stands in one connected Xbox controller in the browser's standard layout, before the game loads.
+PAD_JS = """(() => {
+  const pad = {id: "Xbox Wireless Controller (STANDARD GAMEPAD Vendor: 045e Product: 0b13)", index: 0, connected: true,
+    mapping: "standard", timestamp: 0, axes: [0, 0, 0, 0],
+    buttons: Array.from({length: 17}, () => ({value: 0, pressed: false, touched: false}))};
+  Object.defineProperty(navigator, "getGamepads", {value: () => [pad, null, null, null], configurable: true});
+  window.__pad_button = (b, v) => { pad.buttons[b].value = v; pad.buttons[b].pressed = v > 0.5; pad.timestamp = performance.now(); };
+  window.__pad_axes = (x, y) => { pad.axes = [x, y, 0, 0]; pad.timestamp = performance.now(); };
+})();"""
 ARGS = ["--no-sandbox", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"]
 
 @contextlib.contextmanager
@@ -72,6 +90,18 @@ class Run:
             if await self.page.evaluate(js, [db, texts]): return time.time() - t
             await self.page.wait_for_timeout(500)
         self.errs.append("save with %r never reached the browser's storage in %ds" % (texts, secs)); return -1
+    async def use_pad(self):
+        """Connects a pretend Xbox controller. Call it before open()."""
+        await self.ctx.add_init_script(PAD_JS)
+    async def pad(self, button, hold_ms=1200, wait=600):
+        """Presses and releases one Xbox button by name (PAD_BUTTONS)."""
+        b = PAD_BUTTONS[button.upper()]
+        await self.page.evaluate("b => window.__pad_button(b, 1)", b); await self.page.wait_for_timeout(hold_ms)
+        await self.page.evaluate("b => window.__pad_button(b, 0)", b); await self.page.wait_for_timeout(wait)
+    async def pad_stick(self, x, y, hold_ms=1500, wait=400):
+        """Holds the left stick at x, y (-1 to 1, y down is +1), then lets it go."""
+        await self.page.evaluate("([x, y]) => window.__pad_axes(x, y)", [x, y]); await self.page.wait_for_timeout(hold_ms)
+        await self.page.evaluate("() => window.__pad_axes(0, 0)"); await self.page.wait_for_timeout(wait)
     async def key(self, k, wait=350): await self.page.keyboard.press(k); await self.page.wait_for_timeout(wait)
     async def cmd(self, c, wait=500): await self.page.evaluate("window.%s_cmd = %r" % (self.name, c)); await self.page.wait_for_timeout(wait)
     async def shot(self, n): await self.page.screenshot(path=os.path.join(self.shots, n + ".png"))
