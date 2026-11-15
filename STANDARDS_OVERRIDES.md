@@ -5,7 +5,7 @@ This file lists where this game does something else, and why. A rule not listed 
 Order of authority: Brian in the chat, then this file, then the standards.
 
 Last reviewed: 2026-11-15, with v0.1.0 live.
-Checked against: game-standards version 2026-11-14 (commit e4688a1).
+Checked against: game-standards version 2026-11-15 (commit 416fd8c).
 
 On 2026-11-14 Brian told Claude to apply only the standards that fit a sports game and to use its own judgment. Rows agreed under that instruction say "delegated". Brian can change any of them.
 
@@ -28,9 +28,10 @@ A Proposed row is not in force. The standard applies until Brian agrees.
 
 ## Open items (rule applies, work not finished)
 
-Every item below except G7.8 is fixed in the v0.2.0 work, which is built and tested but not released yet.
+Every item below except G7.8, E6.7 and G10.1 is fixed in the v0.2.0 work, which is built and tested but not released yet.
 
 - G7.8: fixed in the source on 2026-11-15. `window.ttf` and the `bot` and `fast` switches now need the whole-word `?test` flag, read with the kit's `TestBridge.has_flag`. The Android build reads no switches. The live browser build in `docs/play/` is still the v0.1.0 build, where `?bot` and `?fast` work without `?test`. It ends with the next build. Brian asked for no new build in this push. The v0.2.0 work still needs the same change for its `demo` and `start` switches.
+- E6.7: saves are written and read by the game's own code, not the kit's `save_store.gd`, and there is no `save_store_check.gd` in the test gate. Moves to kit 1.4.0 at the next release, together with G10.1.
 - G10.1: the game still has its own save code. It moves to `addons/bc_common/save_store.gd` at the next release, as Brian asked. The `?test` hook now uses the kit's `test_bridge.gd`.
 - G10.4: the v0.1.0 release notes name no kit version. The next release notes will.
 - E1.2: many variables, arrays and dictionaries are untyped.
@@ -52,9 +53,9 @@ Every item below except G7.8 is fixed in the v0.2.0 work, which is built and tes
 
 ## Rules met
 
-Checked by reading the code and the repo against commit e4688a1 of game-standards. The bot games, the browser test, a G7.8 check and the page check ran headless. Nothing was measured on a phone.
+Checked by reading the code and the repo against commit 416fd8c of game-standards. The bot games, the browser test, a G7.8 check and the page check ran headless. Nothing was measured on a phone.
 
-- Game standards: G0.10 (no standards copies in this repo), G0.12, G1.1, G1.2, G1.3, G1.4, G1.5, G1.6, G1.7 (no key or password here, the key lives in `game-signing`), G1.8, G1.9 (`SECRETS check ok`, `signing.properties` and `game-signing/` in `.gitignore`), G2.1 to G2.6, G3.1 to G3.5, G4.2, G4.6, G5.1, G5.4, G5.5, G5.6, G6.1, G6.2, G6.4, G6.5, G7.3, G7.4, G7.5, G8.1 to G8.4, G10.2, G10.3 (`COMMON check ok: 1.3.0 e4688a1`), G10.5.
+- Game standards: G0.10 (no standards copies in this repo), G0.12, G1.1, G1.2, G1.3, G1.4, G1.5, G1.6, G1.7 (no key or password here, the key lives in `game-signing`), G1.8, G1.9 (`SECRETS check ok`, `signing.properties` and `game-signing/` in `.gitignore`), G1.10 (card on The Game Shelf, footer link to it), G1.11 (no personal names on the game page, the card or the repo description), G2.7 (the card is right for v0.1.0. It is refreshed with every release from now on), G2.1 to G2.6, G3.1 to G3.5, G4.2, G4.6, G5.1, G5.4, G5.5, G5.6, G6.1, G6.2, G6.4, G6.5, G7.3, G7.4, G7.5, G8.1 to G8.4, G10.2, G10.3 (`COMMON check ok: 1.3.0 e4688a1`), G10.5.
 - Proposed rules the game already follows: G4.8, G4.9, G6.7, G7.6.
 - Engineering standards: E1.1, E1.4, E2.1, E2.2, E2.3, E2.5, E5.1, E6.6. Browser threads off (part of E6.1).
 
