@@ -1,7 +1,18 @@
 # Game standards (Brian Clark)
 
-Updated with every release of every game. Start a new game by reading this file first.
+The shared standards for every game Brian makes. Start a new game by reading this file first.
 Source of truth: this file in the newest game repo. Today: `tiny-titans-football/handoff/`.
+
+## 0. How standards and overrides work
+
+1. Two files. `handoff/STANDARDS.md` (this file) holds the rules shared by all games. `STANDARDS_OVERRIDES.md` at the root of each game repo holds that game's exceptions.
+2. Order of authority: what Brian says in the chat, then the game's `STANDARDS_OVERRIDES.md`, then this file.
+3. Every rule has an id: section number, a dot, rule number. Example: `4.1`. Never renumber a rule. Retire a rule by marking it retired and add new rules at the end of a section.
+4. An override names the rule id, says what the game does instead, gives the reason and carries the date Brian approved it.
+5. A rule with no override applies in full. Keep this file free of game-specific exceptions. They belong in the override file.
+6. Only Brian approves an override. When a standard does not fit a game, propose the override, list it as a judgment call and mark it `Proposed` until he confirms.
+7. When an override turns out to fit every game, move it into this file as a rule and delete the override.
+8. Each game repo keeps its own copy of this file. Do not sync it into other game repos unless Brian asks.
 
 ## 1. Repos and pages
 
@@ -18,7 +29,7 @@ Source of truth: this file in the newest game repo. Today: `tiny-titans-football
 2. GitHub repo link.
 3. APK, named `<GameName>-v<version>.apk`, sent as a file and live on the game page.
 4. Backlog document, updated, sent as a file and linked.
-5. Game standards handoff zip (this folder, zipped), sent as a file.
+5. Game standards handoff zip (this folder, zipped, plus the game's override file), sent as a file.
 6. Game page updated: version line, what is new, APK link. Release notes with a test checklist.
 
 ## 3. Reporting to Brian
@@ -37,8 +48,7 @@ Source of truth: this file in the newest game repo. Today: `tiny-titans-football
 4. Records and achievements are personal bests only. No leaderboards, no opponents.
 5. A seasonal theme (Christmas) is a toggle that stays off until turned on.
 6. Keep a `BACKLOG.md`: Done, Now, Asked for by Brian, Ideas to choose from, Later, Not planned and Decisions. Offer numbered ideas so Brian picks by number.
-
-7. Sports and versus games are the exception to rule 1 when Brian asks for one (Tiny Titans Football, 2026-11-14). Write that exception in the repo's `CLAUDE.md`.
+7. Retired 2026-11-14. Game-specific exceptions now live in each game's `STANDARDS_OVERRIDES.md` (see section 0).
 8. New game from another game's style: review the reference first, then deliver a plan and backlog doc before any build. Borrow structure, never content. Check the name for overlaps and tell Brian what you found.
 9. Keep game content as data (plays, teams, finds) so new content needs no code.
 
@@ -60,7 +70,6 @@ Source of truth: this file in the newest game repo. Today: `tiny-titans-football
 4. Build the world in code where possible. Group scenery in chunks so far-off objects are skipped.
 5. Phones draw depth coarsely. Never lay a road or decal as a thin layer on the ground. Give it its own raised mesh and collision.
 6. Anything a player can touch has collision. Anything on a road can be knocked over or driven round.
-
 7. Never fetch the signing key unless Brian says so in the chat. Without it, sign a test build with a throwaway key, say so plainly and note that testers must uninstall before the real key is used.
 8. On-field lines, numbers and markings go into one ground texture. Raised strips for moving markers.
 9. Slow devices: cap the frame step and take up to three smaller steps per frame so the game stays in real time.
@@ -72,7 +81,6 @@ Source of truth: this file in the newest game repo. Today: `tiny-titans-football
 3. A browser test loads the web build in headless Chrome with `errors []`, and the screenshots are viewed.
 4. The live game page and APK link are checked after the push.
 5. State what could not be tested (real devices, sound).
-
 6. Games with rules (sports, puzzles): a test bot plays full games headless and prints each result. The browser test reads the game state from the page instead of guessing wait times.
 
 ## 8. Assets
@@ -84,7 +92,8 @@ Source of truth: this file in the newest game repo. Today: `tiny-titans-football
 
 ## 9. What is in this handoff
 
-- `GAME_STANDARDS.md`: this file.
+- `STANDARDS.md`: this file.
+- `STANDARDS_OVERRIDES.md`: this game's overrides. `templates/STANDARDS_OVERRIDES.md` is the blank starting point for a new game.
 - `templates/`: starting points for a new game (`CLAUDE.md`, game page, backlog, release notes, credits, Godot project and export settings, `.gitignore`).
 - `reusable/`: code that carries over (`hud.gd` with the Menu button, touch pads, messages and journal. `web_test.py` browser test. `make_sfx.py` chimes. `patch_assets.py` to search and fetch Patch.gg assets).
 - `games/`: each game's current rules, backlog and credits for reference (The Scenic Route and Tiny Titans Football).

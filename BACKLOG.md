@@ -62,6 +62,10 @@ Updated 2026-11-14 for v0.1.0. Brian decides the order.
 - 2026-11-14: 11 on 11. Arcade feel. Use Patch.gg.
 - 2026-11-14: Name is Tiny Titans Football. Brian kept the name after seeing the overlap notes (DC Comics "Tiny Titans", Tennessee Titans).
 
+- 2026-11-14: Keep the test signing key for now.
+- 2026-11-14: Standards split into `handoff/STANDARDS.md` and a per-game `STANDARDS_OVERRIDES.md`. Game repos keep separate copies for now.
+- 2026-11-14: v0.2 scope picked: kicking game and returns, feel and polish, bigger playbook, season mode.
+
 ## Judgment calls made in v0.1.0 (Brian to confirm or change)
 
 1. Players are built in code, not taken from Patch.gg.

@@ -19,7 +19,8 @@ v0.1.0, first test build: one exhibition game against the computer, 8 offensive 
 - `audio/`: music and hit sounds (see CREDITS.md) and stadium sounds made by `tools/make_sfx.py`.
 - `tests/web_test.py`: browser check with screenshots.
 - `docs/`: the GitHub Pages site. Game page at the root, the game in `docs/play/`, APKs in `docs/downloads/`.
-- `BACKLOG.md`: the backlog. `handoff/`: the game standards that carry over to every game.
+- `BACKLOG.md`: the backlog.
+- `handoff/STANDARDS.md`: the standards shared by every game. `STANDARDS_OVERRIDES.md`: where this game differs.
 
 ## Build and test
 
