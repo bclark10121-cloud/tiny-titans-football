@@ -1,6 +1,6 @@
 # Tiny Titans Football
 
-Arcade 11 on 11 football. Call a play, then run it. Built in Godot 4.6 for Android and the browser.
+Arcade 7 on 7 and 11 on 11 football. Call a play, then run it. Built in Godot 4.6 for Android and the browser.
 
 Game page (play in the browser or download the Android APK): https://bclark10121-cloud.github.io/tiny-titans-football/
 
