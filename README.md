@@ -20,7 +20,7 @@ v0.1.0, first test build: one exhibition game against the computer, 8 offensive 
 - `tests/web_test.py`: browser check with screenshots.
 - `docs/`: the GitHub Pages site. Game page at the root, the game in `docs/play/`, APKs in `docs/downloads/`.
 - `BACKLOG.md`: the backlog.
-- `handoff/GAME_STANDARDS.md`: the standards shared by every game. `STANDARDS_OVERRIDES.md`: where this game differs.
+- `handoff/GAME_STANDARDS.md` and `handoff/ENGINEERING_STANDARDS.md`: the standards shared by every game. Master copies live in the private repo `game-standards`. `STANDARDS_OVERRIDES.md`: where this game differs.
 
 ## Build and test
 

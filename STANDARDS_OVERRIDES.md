@@ -4,7 +4,7 @@ Standards: `handoff/GAME_STANDARDS.md` (rule ids start with G) and `handoff/ENGI
 This file lists where this game does something else, and why. A rule not listed here applies in full.
 Order of authority: Brian in the chat, then this file, then the standards.
 
-Last reviewed: v0.1.0 (2026-11-14). The engineering standards file is not in this repo yet. The E rows and open items below come from an audit against the copy Brian shared on 2026-11-14.
+Last reviewed: v0.1.0 (2026-11-14), against both standards files version 2026-11-14.
 
 ## Overrides
 
@@ -19,6 +19,7 @@ Last reviewed: v0.1.0 (2026-11-14). The engineering standards file is not in thi
 | 7 | G6.6 | Anything a player can touch has collision | Players push apart and tackle by distance checks. No collision shapes | 22 players stay cheap on phones and results stay predictable | The game moves to physics bodies | Proposed |
 | 8 | G7.1 | A headless driver proves the main route with 0 resets | A test bot plays full games headless: `--bot --games=6` | There is no route to drive | No end planned | Proposed |
 | 9 | E3.2 | Repeated props use `MultiMeshInstance3D` or are merged by material | Each player is about 11 separate mesh nodes with moving arms and legs. 22 players come to about 240 draw calls | Limbs animate per player, so they cannot share one multimesh as built | Players become single skinned meshes | Proposed |
+| 10 | E4.1 | Physics engine: the default is GodotPhysics3D, chosen per game | No physics engine. Players move with plain maths | 22 players stay cheap on phones and results stay predictable. Same reason as row 7 | The game moves to physics bodies | Proposed |
 
 A Proposed row is not in force. The standard applies until Brian agrees.
 
@@ -37,7 +38,7 @@ A Proposed row is not in force. The standard applies until Brian agrees.
 - E6.1: browser audio playback type is not confirmed as Sample.
 - E6.2: title music starts before the first input.
 - E6.3: sound effects are `.ogg`, not mono `.wav`. Music bitrate is not checked.
-- E6.4: the save is written directly, with no temp file and rename.
+- E6.4: Android writes the save directly, with no temp file and rename. The browser writes directly but does not call `JavaScriptBridge.force_fs_sync()`.
 - E6.5: no save on pause, focus loss or close. No browser file sync call.
 
 ## Rules met
@@ -49,7 +50,7 @@ Checked by reading the code and the repo at v0.1.0. Nothing was measured on a de
 
 ## Not in use in this game
 
-Finds and journal, seasonal theme (G4.5), physics engine and colliders (E4.1 to E4.3), navigation, particles, skeletons, ORM textures, lightmaps.
+Finds and journal, seasonal theme (G4.5), physics timing and colliders (E4.2, E4.3), navigation (E4.4), particles, skeletons, ORM textures, lightmaps.
 
 ## How to add an override
 

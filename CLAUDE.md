@@ -13,7 +13,7 @@ Note: this game has an opponent and a final score. `STANDARDS_OVERRIDES.md` reco
 
 ## Rules
 
-- Read `handoff/GAME_STANDARDS.md` (rule ids start with G), then `handoff/ENGINEERING_STANDARDS.md` once it is in the repo (rule ids start with E), then `STANDARDS_OVERRIDES.md` (where this game differs). Order of authority: Brian in the chat, then the overrides, then the standards.
+- Read `handoff/GAME_STANDARDS.md` (rule ids start with G), then `handoff/ENGINEERING_STANDARDS.md` (rule ids start with E), then `STANDARDS_OVERRIDES.md` (where this game differs). Order of authority: Brian in the chat, then the overrides, then the standards.
 - Never edit a standards file in this repo. Propose a new standard to Brian. A football-only exception goes in `STANDARDS_OVERRIDES.md` as `Proposed` until Brian approves it.
 - Do not sync the standards into other game repos unless Brian asks.
 - Top menu: one Menu button at the top right opens all options in a row across the top.

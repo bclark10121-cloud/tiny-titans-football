@@ -6,7 +6,7 @@ OUT="${1:-..}"
 S=$(mktemp -d)
 D="$S/Game_Standards_handoff"
 mkdir -p "$D/templates/godot" "$D/templates/game-page" "$D/reusable" "$D/games/tiny-titans-football" "$D/games/the-scenic-route"
-cp handoff/GAME_STANDARDS.md "$D/"
+cp handoff/GAME_STANDARDS.md handoff/ENGINEERING_STANDARDS.md "$D/"
 cp handoff/templates/* "$D/templates/"
 cp project.godot export_presets.cfg .gitignore "$D/templates/godot/"
 cp docs/index.html "$D/templates/game-page/index.html"
