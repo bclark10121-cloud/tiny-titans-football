@@ -1,8 +1,23 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-15 after v0.2.0. Brian decides the order.
+Updated 2026-11-15 for v0.3.0. Brian decides the order.
 
 ## Done
+
+### v0.3.0
+
+- Season mode (asked for by Brian). 6 weeks against the other 3 teams, twice each. The other game each week is simulated from team ratings. Standings with W, L, T, points for and points against. The top 2 meet in the Title Game, which goes to more overtime until someone scores. Saved on the device. End season takes two presses.
+- Burst button (asked for by Brian). 2 seconds at 1.3 times top speed, ready again 5 seconds after it ends. F, LT or the Burst button with a gold charge ring. Hold-to-sprint stays on Shift, RT and the Sprint button. A runner on a burst is a little harder to tackle.
+- Continue a game. Saved at every play call, kickoff and try. The title card shows the score of the game in progress.
+- Pause when the game loses focus. The Menu opens and the clock stops.
+- Skip the wait after a play with A, Space or a tap.
+- Run it again: the play call opens on your last play, marked Last. Defense too.
+- Settings panel on the title card and in the Menu: Music, Sound effects, Vibration, Auto pass, Players and Quarter length (1, 2 or 3 minutes).
+- Vibration on tackles, stronger on sacks and fumbles. Phone buzz and controller rumble. Android asks for the vibration permission.
+- Clearer team screen: Practice mode and Auto pass show On or Off in words. A Back button.
+- B goes back on every screen. The D-pad stays inside each panel and on the play cards. The play card gets the focus back when the Menu closes.
+- How to play in two columns so it fits on the screen.
+- New tests: `tests/qol_check.gd` (30 steps) and the `--season` bot run. The browser and pretend-controller tests cover Settings, the season screen and the burst.
 
 ### v0.2.0
 
@@ -38,23 +53,16 @@ Updated 2026-11-15 after v0.2.0. Brian decides the order.
 
 ## Now
 
-- Brian plays v0.2.0 and reports how it feels. Test checklist: `docs/release-notes/v0.2.0.md`.
-- Testers uninstall v0.1.0 once before they install v0.2.0.
+- Brian plays v0.3.0 and reports how it feels. Test checklist: `docs/release-notes/v0.3.0.md`.
+- v0.3.0 installs over v0.2.0. Anyone still on v0.1.0 uninstalls it once.
 
-## Next (planned for v0.3.0)
+## Next (v0.4.0, Brian picks)
 
-Brian's v0.2.0 playtest notes come first and outrank this list.
+Brian's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 yet. The top candidates:
 
-1. Burst button (asked for by Brian, 2026-11-15). A touch button that gives a burst of speed for 2 seconds. Today sprint is a hold: Shift on a keyboard, RT on a controller, the Sprint button on touch. Assumptions to confirm: the burst works again after 5 seconds, hold-to-sprint stays, and keyboard and controller get the burst on a key and a button too.
-2. Season mode with standings and a playoff. Brian picked it for v0.2.0. It moved here so v0.2.0 could ship.
-3. Quality of life. Picked by Claude on 2026-11-15 at Brian's request. In build order:
-   1. Continue a game. The game keeps the score, clock, quarter, down, ball spot, teams and settings when the app goes to the background or closes. The title shows Continue. Why: if Android closes the app in the background, the game in progress is lost today. Season mode needs the same save. Size: medium.
-   2. Pause when the game loses focus. The Menu opens and the clock stops when the app or browser tab loses focus mid-game. Why: today a pulled-down notification shade or a click in another window lets the play run on. Size: small.
-   3. Skip the wait after a play. After the whistle the game waits 2.3 seconds. A, Space or a tap moves on after half a second. Why: quick downs are a pillar. Size: small.
-   4. Run it again. The play call opens on the tab of your last play, with its card highlighted and marked Last. One press calls it again. Fourth down still opens the Kick tab. Why: arcade players repeat plays that work. Today the play call opens on Short, Run or Kick by down and distance. Size: small.
-   5. Settings panel. The Menu gets one Settings button with Music, Sound effects, Auto pass, Players (7 on 7 or 11 on 11), Quarter length (1, 2 or 3 minutes) and Vibration. Why: today one Sound switch turns off both music and effects. Players only shows on the team screen. Quarter length lets a game run about 5 to 15 minutes. The Menu row also gets shorter. Size: medium.
-   6. Vibration on big hits. A short buzz on the phone and a rumble on the controller for tackles, sacks and big hits, with the switch in Settings. On by default. Why: big hits are a pillar. Size: small.
-   7. Clearer switches on the team screen (was idea 13). Practice mode and Auto pass show On or Off in words. Size: small.
+1. Better character design (asked for by Brian). Helmets, pads, jerseys and numbers that read as football players.
+2. Penalties (idea 1).
+3. A 7 on 7 playbook (idea 13).
 
 ## Asked for by Brian, not built yet
 
@@ -108,6 +116,28 @@ Brian's v0.2.0 playtest notes come first and outrank this list.
 - 2026-11-15: Every release updates The Game Shelf card with every relevant change, in the same push.
 - 2026-11-15: Xbox controller support per G5.8, with Xbox button names and a pretend-controller browser test.
 - 2026-11-15: Claude picks the quality of life items for v0.3.0 (Brian: "use your best judgement").
+- 2026-11-15: v0.3.0 holds the burst button, season mode and the quality of life items together (Brian: "move forward with the next release").
+- 2026-11-15: LT is the burst and RT stays hold-to-sprint. Brian asked for RT, then kept LT.
+
+## Judgment calls made in v0.3.0 (Brian to confirm or change)
+
+1. Everything planned shipped in one release: the burst, season mode and the 7 quality of life items.
+2. A season is 6 weeks: each rival twice. The top 2 by win share, then point difference, then points scored, play the Title Game. If you miss it, the Title Game is simulated.
+3. Games you do not play are simulated from the team ratings in `data/teams.json`, with higher scores in 7 on 7. They never end tied.
+4. A tied Title Game goes to more overtime periods until someone scores. Regular season ties count as ties.
+5. The burst is 1.3 times top speed for 2 seconds, then 5 seconds to charge. It also lowers the tackle chance a little. The computer never bursts.
+6. The burst belongs to whoever you control. It keeps charging between plays.
+7. Keyboard burst is F. Controller burst is LT. Touch has a fourth Burst button above Juke.
+8. Continue saves at play calls, kickoffs and tries, not mid-play. A game left mid-play picks up at the play call before it.
+9. Practice games are never saved for Continue. Starting any new game replaces the saved one. A finished game clears it.
+10. Players and Quarter length change from the next game, not the game in progress.
+11. The old Sound switch is now Sound effects, with the crowd. Music has its own switch, on for everyone after the update.
+12. Vibration is on by default. Tackles that involve the player you control buzz. Sacks and fumbles buzz harder.
+13. Skip the wait needs half a second first, so a mashed button does not skip the result banner.
+14. Pause on focus loss opens the Menu in any in-game screen, play call included.
+15. Run it again also opens the defense on your last defense.
+16. The title field now shows the 7 on 7 or 11 on 11 choice.
+17. The season screenshot on the game page shows a season after 2 weeks. Every score in it came from the game's own season simulation.
 
 ## Judgment calls made in v0.2.0 (Brian to confirm or change)
 

@@ -6,7 +6,7 @@ Game page (play in the browser or download the Android APK): https://bclark10121
 
 ## Status
 
-v0.2.0, second test build: an exhibition game against the computer, 7 on 7 by default or 11 on 11, with kickoffs, punts, returns, two-point tries and overtime. Full Xbox controller support. 33 offensive plays (including option plays), 20 defenses, hot routes, audibles, an Auto pass setting, three difficulty levels, 4 fictional teams and a Practice mode.
+v0.3.0, third test build: exhibition games and a 6 week season with a Title Game, 7 on 7 by default or 11 on 11, with kickoffs, punts, returns, two-point tries and overtime. A 2 second burst, Continue, Settings and full Xbox controller support. 33 offensive plays (including option plays), 20 defenses, hot routes, audibles, an Auto pass setting, three difficulty levels, 4 fictional teams and a Practice mode.
 
 ## Layout
 
@@ -21,12 +21,13 @@ v0.2.0, second test build: an exhibition game against the computer, 7 on 7 by de
 - `tests/web_test.py`: browser check with screenshots. It uses the shared helpers in `tests/common/`.
 - `tests/pad_test.py`: browser check with the kit's pretend Xbox controller (G5.8).
 - `tests/controller_check.gd` and `tests/screens_check.gd`: headless checks that every screen works with only a controller.
+- `tests/qol_check.gd`: headless check of Settings, season, Continue, Run it again, skip the wait, pause on focus loss and the burst.
 - `addons/bc_common/`, `tools/common/`, `tests/common/` and `common.lock`: the shared kit, pulled from the private repo `game-standards` (G10). Never edit these here.
 - `docs/`: the GitHub Pages site. Game page at the root, the game in `docs/play/`, APKs in `docs/downloads/`.
 - `BACKLOG.md`: the backlog.
 - `STANDARDS_OVERRIDES.md`: where this game differs from the shared standards. The standards themselves live only in the private repo `game-standards`. This repo holds no copies.
 
-## Controls (v0.2.0)
+## Controls (v0.3.0)
 
 | Action | Keyboard | Xbox controller | Touch |
 |---|---|---|---|
@@ -36,6 +37,8 @@ v0.2.0, second test build: an exhibition game against the computer, 7 on 7 by de
 | Snap | Space | A | Snap button |
 | Pass: tap for a bullet, hold for a lob | 1 to 4 | The button shown on the receiver: A, B, X or Y | Tap the receiver |
 | Sprint | Hold Shift, or Space after the throw | Hold RT | Hold Sprint |
+| Burst: 2 seconds of top speed, 5 seconds to charge | F | LT | Burst |
+| Skip the wait after a play | Space | A | Tap |
 | Juke, or pitch on option plays | E | B | Juke or Pitch |
 | Dive or tackle | Q | X | Dive or Tackle |
 | Switch defender | Tab | LB | Switch |
@@ -52,11 +55,13 @@ v0.2.0, second test build: an exhibition game against the computer, 7 on 7 by de
     godot --path . -- --demo                                  # the computer plays both sides at normal speed, with full drawing
     # browser test switches need ?test: index.html?test&start_punt or ?test&start_fg opens on fourth down with the ball
     godot --headless --path . -- --bot --games=6 --mode=11  # the same in 11 on 11
+    godot --headless --path . -- --bot --season --games=20  # the computer plays a whole season and the Title Game
     godot --headless --path . --export-release Web
     python3 tests/web_test.py <web folder> <shots folder>     # must print: errors []
     python3 tests/pad_test.py <web folder> <shots folder>     # pretend Xbox controller, must print: errors []
     godot --headless --path . -s res://tests/controller_check.gd       # must print: JOY020 check ok
     godot --headless --path . -s res://tests/screens_check.gd          # must print: SCREENS check ok
+    godot --headless --path . -s res://tests/qol_check.gd              # must print: QOL030 check ok
     godot --headless --path . -s res://tests/common/save_store_check.gd  # must print: SAVESTORE check ok
     bash tools/common/check_secrets.sh                        # must print: SECRETS check ok
     bash tools/common/sync_common.sh --check .                # must print: COMMON check ok

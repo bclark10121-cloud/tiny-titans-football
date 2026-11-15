@@ -39,6 +39,7 @@ var juke_vec: Vector3 = Vector3.ZERO
 var dive_t: float = 0.0
 var burst: float = 1.0
 var sprinting: bool = false
+var boost: bool = false  # the 2 second burst is on: set each frame by main.gd for the player you control
 var throw_t: float = 0.0
 var kick_t: float = 0.0
 var kneel: bool = false
@@ -93,6 +94,7 @@ func reset_play() -> void:
 	dive_t = 0.0
 	burst = 1.0
 	sprinting = false
+	boost = false
 	throw_t = 0.0
 	kick_t = 0.0
 	kneel = false
@@ -103,6 +105,8 @@ func reset_play() -> void:
 	set_tag("")
 
 func speed_now() -> float:
+	if boost:
+		return top_speed * 1.3
 	if sprinting and burst > 0.0:
 		return top_speed * 1.16
 	return top_speed

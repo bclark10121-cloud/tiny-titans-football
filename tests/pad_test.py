@@ -16,6 +16,18 @@ async def main():
             await r.open(base + "index.html?test")
             s = await r.wait_phase([TITLE], 90)
             await r.page.wait_for_timeout(1500); await r.shot("pad_01_title")
+            # v0.3.0: Settings and the season screen with only the controller
+            await r.pad("RIGHT", hold_ms=150, wait=300); await r.pad("RIGHT", hold_ms=150, wait=300); await r.pad("A", hold_ms=150, wait=600)
+            s = await r.state() or {}; await r.shot("pad_01b_settings")
+            r.checks.append("%s D-pad to Settings, A opens it" % ("ok  " if s.get("settings") else "FAIL"))
+            await r.pad("B", hold_ms=150, wait=500); s = await r.state() or {}
+            r.checks.append("%s B closes Settings" % ("ok  " if not s.get("settings") and s.get("phase") == TITLE else "FAIL"))
+            await r.pad("RIGHT", hold_ms=150, wait=300); await r.pad("A", hold_ms=150, wait=600); await r.pad("A", hold_ms=150, wait=800)
+            s = await r.state() or {}; await r.shot("pad_01c_season")
+            r.checks.append("%s Season, then A on a team, starts a season" % ("ok  " if s.get("phase") == 8 and s.get("season_on") else "FAIL"))
+            await r.pad("B", hold_ms=150, wait=600); s = await r.state() or {}
+            r.checks.append("%s B goes back to the title" % ("ok  " if s.get("phase") == TITLE else "FAIL"))
+            await r.pad("LEFT", hold_ms=150, wait=300)
             await r.pad("A")
             s = await r.wait_phase([TEAMSEL], 20)
             r.checks.append("%s A on the title card opens the team screen" % ("ok  " if s.get("phase") == TEAMSEL else "FAIL"))
@@ -65,6 +77,26 @@ async def main():
             r.checks.append("%s View opens the Menu" % ("ok  " if s.get("menu") else "FAIL"))
             await r.pad("VIEW"); s = await r.state() or {}
             r.checks.append("%s View closes the Menu" % ("ok  " if not s.get("menu") else "FAIL"))
+            # v0.3.0: LT is the burst (RT sprints). Snap a play of ours, then pull LT while the ball is live
+            boosted = None; t1 = time.time()
+            while time.time() - t1 < 120 and boosted is None:
+                s = await r.state() or {}
+                ph = s.get("phase"); poss = s.get("poss")
+                if ph == PLAYCALL:
+                    await r.page.wait_for_timeout(600); await r.pad("A", hold_ms=150, wait=600)
+                elif ph == PRESNAP and poss == 0 and s.get("kind") == "scrim":
+                    await r.page.wait_for_timeout(500); await r.pad("A", hold_ms=150, wait=300)
+                    s = await r.wait_phase([LIVE, DEAD], 10)
+                    if s.get("phase") == LIVE:
+                        await r.pad("LT", hold_ms=150, wait=100); s = await r.state() or {}
+                        boosted = bool(s.get("boost")) if s.get("phase") == LIVE else None
+                        if boosted: await r.shot("pad_06_burst")
+                    await r.wait_phase([DEAD, PLAYCALL, KICK, OVER], 40)
+                elif ph == PRESNAP:
+                    await r.page.wait_for_timeout(600); await r.pad("A", hold_ms=150, wait=400)
+                else:
+                    await r.page.wait_for_timeout(300)
+            r.checks.append("%s LT bursts while the ball is live" % ("ok  " if boosted else "FAIL"))
             for c in r.checks:
                 if c.startswith("FAIL"): r.errs.append(c)
     print(r.report())

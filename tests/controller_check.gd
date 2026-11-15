@@ -32,6 +32,9 @@ func _initialize() -> void:
 
 func _run() -> void:
 	await create_timer(0.8).timeout
+	main.call("_forget_game")  # no saved game: Exhibition has the focus on the title card
+	main.call("goto_title")
+	await create_timer(0.3).timeout
 	await _press(JOY_BUTTON_A)
 	await create_timer(0.4).timeout
 	log_lines.append("title: A goes to team screen: %s" % (_st() == 1))

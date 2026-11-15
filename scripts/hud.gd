@@ -12,6 +12,7 @@ signal world_press(pos: Vector2)
 signal world_release(pos: Vector2)
 signal throw_down(i: int)
 signal throw_up(i: int)
+signal screen_tap  # a tap on open grass: skips the wait after a play
 
 const GOLD: Color = Color(1.0, 0.82, 0.2)
 const INK: Color = Color(0.06, 0.09, 0.12, 0.88)
@@ -24,15 +25,35 @@ var score_box: PanelContainer
 var score_lbl: Label
 var info_lbl: Label
 var burst_bar: ProgressBar
+var burst_lbl: Label  # the 2 second burst: ready or charging
+var burst_frac: float = 1.0  # 1 when the burst is ready
 var banner: Label
 var banner_t: float = 0.0
 var hint: Label
 var menu_btn: Button
 var menu_row: HBoxContainer
 var menu_open: bool = false
-var sound_btn: Button
-var auto_btn: Button
-var auto_box: CheckBox
+var auto_box: Button  # team screen: Auto pass On or Off in words
+var settings_panel: Control
+var set_btns: Dictionary = {}  # Settings buttons by action
+var season_panel: Control
+var season_title: Label
+var season_sub: Label
+var season_info: Label
+var season_cells: Array[Label] = []
+var season_play_btn: Button
+var season_end_btn: Button
+var continue_btn: Button
+var continue_lbl: Label
+var season_btn: Button
+var team_title: Label
+var team_note: Label
+var team_season: bool = false  # the team screen is picking a team for a new season
+var practice_row: HBoxContainer
+var over_again: Button
+var over_action: String = "restart"
+var card_last: Array[Label] = []
+var last_id: String = ""  # the play called last time: its card shows Last and gets the focus
 var title_panel: Control
 var team_panel: Control
 var call_panel: Control
@@ -63,14 +84,15 @@ var game_mode: int = 7  # players a side picked on the team screen
 var active_off: Array[String] = []  # roles on the field this game: diagrams draw only these
 var active_def: Array[String] = []
 var difficulty: int = 1
-var practice_box: CheckBox
+var practice_box: Button  # team screen: Practice mode On or Off in words
+var practice_on: bool = false
 
 # touch state read by main.gd
 var pad_active: bool = false
 var touch_seen: bool = false
 var stick: Vector2 = Vector2.ZERO
-var btn_held: Dictionary = {"A": false, "B": false, "C": false}
-var btn_just: Dictionary = {"A": false, "B": false, "C": false}
+var btn_held: Dictionary = {"A": false, "B": false, "C": false, "D": false}
+var btn_just: Dictionary = {"A": false, "B": false, "C": false, "D": false}
 var meter_pos: float = 0.5
 var meter_half: float = 0.1
 var _stick_id: int = -1
@@ -109,6 +131,27 @@ func _btn(t: String, size: int = 24) -> Button:
 	b.add_theme_stylebox_override("pressed", _sb(Color(0.3, 0.4, 0.2, 1), 10, GOLD))
 	b.pressed.connect(func() -> void: menu_action.emit("click"))
 	return b
+
+func _chain(btns: Array[Button], vertical: bool) -> void:
+	# keeps the D-pad inside one overlay (G5.8): neighbours wrap round, the other direction stays put
+	var n: int = btns.size()
+	for i: int in n:
+		var b: Button = btns[i]
+		var prev: NodePath = b.get_path_to(btns[(i - 1 + n) % n])
+		var next: NodePath = b.get_path_to(btns[(i + 1) % n])
+		var me: NodePath = b.get_path_to(b)
+		if vertical:
+			b.focus_neighbor_top = prev
+			b.focus_neighbor_bottom = next
+			b.focus_neighbor_left = me
+			b.focus_neighbor_right = me
+		else:
+			b.focus_neighbor_left = prev
+			b.focus_neighbor_right = next
+			b.focus_neighbor_top = me
+			b.focus_neighbor_bottom = me
+		b.focus_previous = prev
+		b.focus_next = next
 
 func _panel(parent: Control) -> PanelContainer:
 	var p := PanelContainer.new()
@@ -165,6 +208,9 @@ func build(version: String, teams: Array, diff: int, offense_forms: Dictionary, 
 	bb.set_corner_radius_all(3)
 	burst_bar.add_theme_stylebox_override("fill", bf)
 	burst_bar.add_theme_stylebox_override("background", bb)
+	burst_lbl = _lbl("", 16, GOLD)
+	burst_lbl.visible = false
+	sv.add_child(burst_lbl)
 	# message, one fifth of the way down the screen
 	banner = _lbl("", 46)
 	safe.add_child(banner)
@@ -223,6 +269,8 @@ func build(version: String, teams: Array, diff: int, offense_forms: Dictionary, 
 	_build_team(teams)
 	_build_over()
 	_build_help()
+	_build_settings()
+	_build_season()
 	# Menu button and its row, top right (built last so it sits on top)
 	menu_row = HBoxContainer.new()
 	safe.add_child(menu_row)
@@ -235,15 +283,14 @@ func build(version: String, teams: Array, diff: int, offense_forms: Dictionary, 
 	menu_row.alignment = BoxContainer.ALIGNMENT_END
 	menu_row.add_theme_constant_override("separation", 8)
 	menu_row.visible = false
-	for item: Array in [["Resume", "resume"], ["Help", "help"], ["Sound: On", "sound"], ["Auto pass: Off", "autopass"], ["Restart", "restart"], ["Title", "title"]]:
+	var row_btns: Array[Button] = []
+	for item: Array in [["Resume", "resume"], ["Settings", "settings"], ["Help", "help"], ["Restart", "restart"], ["Title", "title"]]:
 		var b := _btn(String(item[0]), 19)
 		var act: String = String(item[1])
 		b.pressed.connect(func() -> void: menu_action.emit(act))
 		menu_row.add_child(b)
-		if act == "sound":
-			sound_btn = b
-		elif act == "autopass":
-			auto_btn = b
+		row_btns.append(b)
+	_chain(row_btns, false)
 	menu_btn = _btn("Menu", 22)
 	safe.add_child(menu_btn)
 	menu_btn.anchor_left = 1.0
@@ -295,11 +342,75 @@ func active_on(role: String, off: bool) -> bool:
 	return list.is_empty() or list.has(role)
 
 func set_auto_pass(on: bool) -> void:
-	# keeps the team screen box and the Menu button in step with the saved setting
+	# keeps the team screen button and Settings in step with the saved setting
 	if auto_box:
-		auto_box.set_pressed_no_signal(on)
-	if auto_btn:
-		auto_btn.text = "Auto pass: On" if on else "Auto pass: Off"
+		auto_box.text = "Auto pass: On" if on else "Auto pass: Off"
+	if set_btns.has("autopass"):
+		(set_btns.autopass as Button).text = "Auto pass: On" if on else "Auto pass: Off"
+
+func set_practice(on: bool) -> void:
+	practice_on = on
+	practice_box.text = "Practice mode: On" if on else "Practice mode: Off"
+
+func set_settings(sv: Dictionary) -> void:
+	# Settings panel labels from the save
+	var onoff := func(k: String) -> String: return "On" if bool(sv.get(k, true)) else "Off"
+	(set_btns.music as Button).text = "Music: %s" % onoff.call("music")
+	(set_btns.sfx as Button).text = "Sound effects: %s" % onoff.call("sound")
+	(set_btns.vibe as Button).text = "Vibration: %s" % onoff.call("vibe")
+	(set_btns.players as Button).text = "Players: %d on %d" % [int(sv.get("mode", 7)), int(sv.get("mode", 7))]
+	var q: int = int(sv.get("qlen", 2))
+	(set_btns.qlen as Button).text = "Quarter length: %d minute%s" % [q, "" if q == 1 else "s"]
+	set_auto_pass(bool(sv.get("auto_pass", false)))
+	set_mode(int(sv.get("mode", 7)))
+
+func set_burst(frac: float, vis: bool) -> void:
+	# the 2 second burst: ready (1) or charging. Redraws only when it changes (E1.3).
+	var f: float = clampf(frac, 0.0, 1.0)
+	burst_lbl.visible = vis
+	var txt: String = "Burst ready" if f >= 1.0 else "Burst charging"
+	if burst_lbl.text != txt:
+		burst_lbl.text = txt
+		burst_lbl.add_theme_color_override("font_color", GOLD if f >= 1.0 else Color(1, 1, 1, 0.55))
+	if absf(f - burst_frac) > 0.03 or (f >= 1.0 and burst_frac < 1.0):
+		burst_frac = f
+		if pad.visible:
+			pad.queue_redraw()
+
+func set_continue(info: String) -> void:
+	# info is empty when no game is saved
+	continue_btn.visible = info != ""
+	continue_lbl.visible = info != ""
+	continue_lbl.text = info
+
+func set_season_btn(txt: String) -> void:
+	season_btn.text = txt
+
+func set_team_mode(season: bool, note: String) -> void:
+	team_season = season
+	team_title.text = "Pick your team for the season" if season else "Pick your team"
+	practice_row.visible = not season
+	team_note.text = note
+
+func set_over_mode(season: bool) -> void:
+	over_action = "season_show" if season else "restart"
+	over_again.text = "Season" if season else "Play again"
+
+func any_panel() -> String:
+	# the screen or panel B goes back from (G5.8)
+	if help_panel.visible:
+		return "help"
+	if settings_panel.visible:
+		return "settings"
+	if menu_open:
+		return "menu"
+	if season_panel.visible:
+		return "season"
+	if team_panel.visible:
+		return "team"
+	if over_panel.visible:
+		return "over"
+	return ""
 
 func set_menu(open: bool) -> void:
 	menu_open = open
@@ -317,8 +428,12 @@ func set_ingame(on: bool) -> void:
 func show_screen(which: String) -> void:
 	title_panel.visible = which == "title"
 	team_panel.visible = which == "team"
+	season_panel.visible = which == "season"
 	if which == "title":
-		(title_panel.find_child("StartBtn", true, false) as Button).grab_focus.call_deferred()
+		var first: Button = continue_btn if continue_btn.visible else (title_panel.find_child("StartBtn", true, false) as Button)
+		first.grab_focus.call_deferred()
+	elif which == "season":
+		(season_play_btn if season_play_btn.visible else season_end_btn).grab_focus.call_deferred()
 	elif which == "team":
 		var g: Node = team_panel.find_child("Teams", true, false)
 		(g.get_child(0) as Button).grab_focus.call_deferred()
@@ -341,15 +456,38 @@ func _build_title(version: String) -> void:
 	var d := _lbl("Arcade 7 on 7 and 11 on 11 football. Call a play, then run it.", 24)
 	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(d)
-	var c := _lbl("Keyboard: WASD or arrows move. Space snaps and sprints. 1 to 4 pass: tap for a bullet, hold for a lob.\nE juke. Q dive or tackle. Tab switch player. R audible. 1 to 4 before the snap: hot route. Esc menu.\nController: stick moves, A picks and snaps. Pass with the button shown on each receiver: A, B, X or Y. Tap for a bullet, hold for a lob.\nRT sprint. B juke or pitch. X dive. LB switch. Y audible. RB plus a receiver's button: hot route. View or Menu: Menu.\nTouch: drag on the left to move. Buttons on the right. Tap a receiver to pass, hold for a lob.", 16, Color(1, 1, 1, 0.85))
+	var c := _lbl("Keyboard: WASD or arrows move. Space snaps and sprints. F burst. 1 to 4 pass: tap for a bullet, hold for a lob.\nE juke. Q dive or tackle. Tab switch player. R audible. 1 to 4 before the snap: hot route. Esc menu.\nController: stick moves, A picks and snaps. Pass with the button shown on each receiver: A, B, X or Y. Tap for a bullet, hold for a lob.\nRT sprint. LT burst. B juke or pitch. X dive. LB switch. Y audible. RB plus a receiver's button: hot route. View or Menu: Menu.\nTouch: drag on the left to move. Buttons on the right, Burst among them. Tap a receiver to pass, hold for a lob.", 16, Color(1, 1, 1, 0.85))
 	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(c)
-	var b := _btn("Start", 32)
-	b.custom_minimum_size = Vector2(260, 64)
-	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	v.add_child(row)
+	continue_btn = _btn("Continue", 28)
+	continue_btn.custom_minimum_size = Vector2(210, 64)
+	continue_btn.name = "ContinueBtn"
+	continue_btn.visible = false
+	continue_btn.pressed.connect(func() -> void: menu_action.emit("continue"))
+	row.add_child(continue_btn)
+	var b := _btn("Exhibition", 28)
+	b.custom_minimum_size = Vector2(210, 64)
 	b.pressed.connect(func() -> void: start_pressed.emit())
 	b.name = "StartBtn"
-	v.add_child(b)
+	row.add_child(b)
+	season_btn = _btn("Season", 28)
+	season_btn.custom_minimum_size = Vector2(210, 64)
+	season_btn.name = "SeasonBtn"
+	season_btn.pressed.connect(func() -> void: menu_action.emit("season"))
+	row.add_child(season_btn)
+	var sb := _btn("Settings", 28)
+	sb.custom_minimum_size = Vector2(210, 64)
+	sb.name = "TitleSettings"
+	sb.pressed.connect(func() -> void: menu_action.emit("settings"))
+	row.add_child(sb)
+	continue_lbl = _lbl("", 18, GOLD)
+	continue_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	continue_lbl.visible = false
+	v.add_child(continue_lbl)
 	var cr := _lbl("Music: \"Rock on Chicago\" by Kevin MacLeod (incompetech.com), CC BY 4.0. Full credits in CREDITS.md.", 13, Color(1, 1, 1, 0.55))
 	cr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(cr)
@@ -362,9 +500,9 @@ func _build_team(teams: Array) -> void:
 	var v := VBoxContainer.new()
 	p.add_child(v)
 	v.add_theme_constant_override("separation", 12)
-	var t := _lbl("Pick your team", 40, GOLD)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	v.add_child(t)
+	team_title = _lbl("Pick your team", 40, GOLD)
+	team_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(team_title)
 	var g := GridContainer.new()
 	g.columns = 2
 	g.add_theme_constant_override("h_separation", 12)
@@ -387,7 +525,7 @@ func _build_team(teams: Array) -> void:
 		sw2.offset_left = -18
 		sw2.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		b.add_child(sw2)
-		b.pressed.connect(func() -> void: team_chosen.emit(i, practice_box.button_pressed, difficulty))
+		b.pressed.connect(func() -> void: team_chosen.emit(i, practice_on and not team_season, difficulty))
 		g.add_child(b)
 	var dr := HBoxContainer.new()
 	dr.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -419,20 +557,33 @@ func _build_team(teams: Array) -> void:
 		mb.pressed.connect(func() -> void: menu_action.emit("mode%d" % m))
 		mr.add_child(mb)
 		mode_btns.append(mb)
-	practice_box = CheckBox.new()
-	practice_box.text = "Practice mode (offense only, no clock, no score)"
-	practice_box.add_theme_font_size_override("font_size", 20)
-	practice_box.custom_minimum_size = Vector2(0, 48)
-	v.add_child(practice_box)
-	auto_box = CheckBox.new()
-	auto_box.text = "Auto pass (the QB throws, you run after the catch)"
-	auto_box.add_theme_font_size_override("font_size", 20)
-	auto_box.custom_minimum_size = Vector2(0, 48)
-	auto_box.toggled.connect(func(_on: bool) -> void: menu_action.emit("autopass"))
-	v.add_child(auto_box)
-	var n := _lbl("Exhibition: four 2-minute quarters against the computer. Ties go to sudden death overtime.", 17, Color(1, 1, 1, 0.8))
-	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	v.add_child(n)
+	# On and Off in words (clearer than small checkboxes)
+	practice_row = HBoxContainer.new()
+	practice_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	practice_row.add_theme_constant_override("separation", 12)
+	v.add_child(practice_row)
+	practice_box = _btn("Practice mode: Off", 20)
+	practice_box.custom_minimum_size = Vector2(250, 48)
+	practice_box.pressed.connect(func() -> void: set_practice(not practice_on))
+	practice_row.add_child(practice_box)
+	practice_row.add_child(_lbl("Offense only, no clock, no score", 18, Color(1, 1, 1, 0.75)))
+	var ar := HBoxContainer.new()
+	ar.alignment = BoxContainer.ALIGNMENT_CENTER
+	ar.add_theme_constant_override("separation", 12)
+	v.add_child(ar)
+	auto_box = _btn("Auto pass: Off", 20)
+	auto_box.custom_minimum_size = Vector2(250, 48)
+	auto_box.pressed.connect(func() -> void: menu_action.emit("autopass"))
+	ar.add_child(auto_box)
+	ar.add_child(_lbl("The QB throws, you run after the catch", 18, Color(1, 1, 1, 0.75)))
+	team_note = _lbl("", 17, Color(1, 1, 1, 0.8))
+	team_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(team_note)
+	var back := _btn("Back", 20)
+	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	back.custom_minimum_size = Vector2(140, 48)
+	back.pressed.connect(func() -> void: menu_action.emit("title"))
+	v.add_child(back)
 
 func _build_call() -> void:
 	call_panel = _full(safe)
@@ -453,6 +604,7 @@ func _build_call() -> void:
 	for i: int in 5:
 		var tb := _btn("", 19)
 		tb.custom_minimum_size = Vector2(150, 48)
+		tb.focus_mode = Control.FOCUS_NONE  # tabs change with LB and RB (or Q and E). The D-pad stays on the play cards
 		tb.pressed.connect(func() -> void: select_tab(i))
 		tab_row.add_child(tb)
 		tab_btns.append(tb)
@@ -474,6 +626,14 @@ func _build_call() -> void:
 		l.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 		l.offset_top = -30
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var lt := _lbl("Last", 15, GOLD)
+		b.add_child(lt)
+		lt.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		lt.offset_left = -48
+		lt.offset_right = -8
+		lt.offset_top = 4
+		lt.visible = false
+		card_last.append(lt)
 		b.pressed.connect(func() -> void: play_chosen.emit(card_ids[i]))
 		call_grid.add_child(b)
 		cards.append(b)
@@ -481,7 +641,8 @@ func _build_call() -> void:
 		card_lbl.append(l)
 		card_ids.append("")
 
-func show_call(title: String, tabs_in: Dictionary, order: PackedStringArray, start: String) -> void:
+func show_call(title: String, tabs_in: Dictionary, order: PackedStringArray, start: String, last: String = "") -> void:
+	last_id = last
 	call_title.text = title
 	tabs = tabs_in
 	tab_names = order
@@ -504,16 +665,33 @@ func select_tab(i: int) -> void:
 		var on: bool = k < list.size()
 		cards[k].visible = on
 		if not on:
+			card_last[k].visible = false
 			continue
 		var cd: Dictionary = list[k]
 		card_ids[k] = String(cd.id)
 		card_diag[k].card = cd
 		card_diag[k].queue_redraw()
 		card_lbl[k].text = "%d  %s" % [k + 1, String(cd.name)] if k < 9 else String(cd.name)
-		if first == null:
+		var is_last: bool = last_id != "" and card_ids[k] == last_id
+		card_last[k].visible = is_last
+		if first == null or is_last:
 			first = cards[k]
+	_card_neighbours(list.size())
 	if first:
 		first.grab_focus.call_deferred()
+
+func _card_neighbours(n: int) -> void:
+	# D-pad moves between the visible play cards only, in a grid of 4 across (G5.8)
+	var cols: int = call_grid.columns
+	for k: int in n:
+		var b: Button = cards[k]
+		var me: NodePath = b.get_path_to(b)
+		b.focus_neighbor_left = b.get_path_to(cards[(k - 1 + n) % n])
+		b.focus_neighbor_right = b.get_path_to(cards[(k + 1) % n])
+		b.focus_neighbor_top = b.get_path_to(cards[k - cols]) if k - cols >= 0 else me
+		b.focus_neighbor_bottom = b.get_path_to(cards[k + cols]) if k + cols < n else me
+		b.focus_previous = b.focus_neighbor_left
+		b.focus_next = b.focus_neighbor_right
 
 func cycle_tab(dir: int) -> void:
 	if tab_names.size() > 1:
@@ -544,10 +722,10 @@ func _build_over() -> void:
 	h.alignment = BoxContainer.ALIGNMENT_CENTER
 	h.add_theme_constant_override("separation", 12)
 	v.add_child(h)
-	var a := _btn("Play again", 26)
-	a.pressed.connect(func() -> void: menu_action.emit("restart"))
-	a.name = "Again"
-	h.add_child(a)
+	over_again = _btn("Play again", 26)
+	over_again.pressed.connect(func() -> void: menu_action.emit(over_action))
+	over_again.name = "Again"
+	h.add_child(over_again)
 	var b := _btn("Title", 26)
 	b.pressed.connect(func() -> void: menu_action.emit("title"))
 	h.add_child(b)
@@ -568,18 +746,138 @@ func _build_help() -> void:
 	var t := _lbl("How to play", 34, GOLD)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(t)
-	var txt: String = "Offense\n  Pick a play from the Short, Deep, Run or Option tab. Press Snap.\n  Pass plays: press a receiver's number. Tap for a fast bullet, hold for a lob over defenders.\n  Auto pass (Menu or team screen): the QB throws for you and you take over the catcher.\n  Option plays: the QB runs at the edge. Pitch (E, B or the Pitch button) to the back, or keep it.\n  Before the snap: Audible (R, Y or the Audible button) swaps the play. 1 to 4 changes a receiver's route.\n  Run plays: sprint, juke past tacklers and dive for extra yards.\n  Four downs to gain 10 yards. On fourth down you may punt or kick a field goal.\n  After a touchdown, kick the extra point or go for two from the 3.\n\nDefense\n  Pick a defense from the Man, Zone, Blitz or Run tab. You control the player with the yellow ring.\n  Switch to the defender nearest the ball. Run into the ball carrier to tackle, or dive at him.\n\nKicks and returns\n  Stop the marker in the green. Punts and kickoffs go farther, field goals go straighter.\n  When you receive, the returner catches the ball. Then you run it back.\n  Interceptions and fumbles are live. Run them back for a score.\n\nTied after four quarters: sudden death overtime. The next score wins.\n\nController (Xbox layout)\n  Stick or D-pad moves and picks. A chooses, snaps and stops the kick meter. B goes back. View or Menu opens the Menu.\n  Pass with the button shown on each receiver: A, B, X or Y. Tap for a bullet, hold for a lob.\n  RT sprint. B juke, or pitch on option plays. X dive or tackle. LB switch player.\n  Before the snap: Y audible. Hold RB and press a receiver's button for a hot route. Play call: LB, RB or B next tab, X back."
-	v.add_child(_lbl(txt, 16))
+	var left: String = "Offense\n  Pick a play from the Short, Deep, Run or Option tab. Press Snap. The play call opens on your last play, marked Last.\n  Pass plays: press a receiver's number. Tap for a fast bullet, hold for a lob over defenders.\n  Auto pass (team screen or Settings): the QB throws for you and you take over the catcher.\n  Option plays: the QB runs at the edge. Pitch (E, B or the Pitch button) to the back, or keep it.\n  Before the snap: Audible (R, Y or the Audible button) swaps the play. 1 to 4 changes a receiver's route.\n  Run plays: sprint, juke past tacklers and dive for extra yards.\n  Burst (F, LT or the Burst button): 2 seconds of top speed. Ready again 5 seconds later.\n  Four downs to gain 10 yards. On fourth down you may punt or kick a field goal.\n  After a touchdown, kick the extra point or go for two from the 3.\n\nDefense\n  Pick a defense from the Man, Zone, Blitz or Run tab. You control the player with the yellow ring.\n  Switch to the defender nearest the ball. Run into the ball carrier to tackle, or dive at him."
+	var right: String = "Kicks and returns\n  Stop the marker in the green. Punts and kickoffs go farther, field goals go straighter.\n  When you receive, the returner catches the ball. Then you run it back.\n  Interceptions and fumbles are live. Run them back for a score.\n  After the whistle, press A, Space or tap to move on.\n\nGames\n  Tied after four quarters: sudden death overtime. The next score wins.\n  Season: 6 weeks against the other 3 teams, twice each. The top 2 meet in the Title Game.\n  Continue on the title card picks up a game you left.\n\nController (Xbox layout)\n  Stick or D-pad moves and picks. A chooses, snaps and stops the kick meter. B goes back. View or Menu opens the Menu.\n  Pass with the button shown on each receiver: A, B, X or Y. Tap for a bullet, hold for a lob.\n  RT sprint. LT burst. B juke, or pitch on option plays. X dive or tackle. LB switch player.\n  Before the snap: Y audible. Hold RB and press a receiver's button for a hot route. Play call: LB, RB or B next tab, X back."
+	var cols := HBoxContainer.new()
+	cols.add_theme_constant_override("separation", 28)
+	v.add_child(cols)
+	for txt: String in [left, right]:
+		var l := _lbl(txt, 15)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(560, 0)
+		cols.add_child(l)
 	var b := _btn("Close", 24)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(func() -> void: menu_action.emit("help_close"))
 	b.name = "HelpClose"
 	v.add_child(b)
+	_chain([b] as Array[Button], true)
 
 func show_help(on: bool) -> void:
 	help_panel.visible = on
 	if on:
 		(help_panel.find_child("HelpClose", true, false) as Button).grab_focus.call_deferred()
+
+func _build_settings() -> void:
+	settings_panel = _full(root)
+	settings_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	settings_panel.visible = false
+	var p := _panel(settings_panel)
+	var v := VBoxContainer.new()
+	p.add_child(v)
+	v.add_theme_constant_override("separation", 10)
+	var t := _lbl("Settings", 34, GOLD)
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(t)
+	for item: Array in [["music", "Music: On"], ["sfx", "Sound effects: On"], ["vibe", "Vibration: On"], ["autopass", "Auto pass: Off"],
+			["players", "Players: 7 on 7"], ["qlen", "Quarter length: 2 minutes"]]:
+		var act: String = String(item[0])
+		var b := _btn(String(item[1]), 22)
+		b.custom_minimum_size = Vector2(420, 52)
+		b.pressed.connect(func() -> void: menu_action.emit(act))
+		v.add_child(b)
+		set_btns[act] = b
+	var n := _lbl("Players and quarter length change from the next game.", 16, Color(1, 1, 1, 0.75))
+	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(n)
+	var c := _btn("Back", 22)
+	c.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	c.custom_minimum_size = Vector2(160, 52)
+	c.pressed.connect(func() -> void: menu_action.emit("settings_close"))
+	c.name = "SettingsClose"
+	v.add_child(c)
+	var chain: Array[Button] = []
+	for k: String in ["music", "sfx", "vibe", "autopass", "players", "qlen"]:
+		chain.append(set_btns[k] as Button)
+	chain.append(c)
+	_chain(chain, true)
+
+func show_settings(on: bool) -> void:
+	settings_panel.visible = on
+	if on:
+		(set_btns.music as Button).grab_focus.call_deferred()
+
+func _build_season() -> void:
+	season_panel = _full(root)
+	season_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	season_panel.visible = false
+	var p := _panel(season_panel)
+	var v := VBoxContainer.new()
+	p.add_child(v)
+	v.add_theme_constant_override("separation", 10)
+	season_title = _lbl("Season", 40, GOLD)
+	season_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(season_title)
+	season_sub = _lbl("", 22)
+	season_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(season_sub)
+	var g := GridContainer.new()
+	g.columns = 6
+	g.add_theme_constant_override("h_separation", 28)
+	g.add_theme_constant_override("v_separation", 6)
+	g.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	v.add_child(g)
+	for r: int in 5:
+		for c: int in 6:
+			var l := _lbl("", 21, GOLD if r == 0 else Color.WHITE)
+			if c > 0:
+				l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+				l.custom_minimum_size = Vector2(44, 0)
+			else:
+				l.custom_minimum_size = Vector2(250, 0)
+			g.add_child(l)
+			season_cells.append(l)
+	season_info = _lbl("", 19, Color(1, 1, 1, 0.85))
+	season_info.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(season_info)
+	var h := HBoxContainer.new()
+	h.alignment = BoxContainer.ALIGNMENT_CENTER
+	h.add_theme_constant_override("separation", 12)
+	v.add_child(h)
+	season_play_btn = _btn("Play week 1", 24)
+	season_play_btn.custom_minimum_size = Vector2(260, 58)
+	season_play_btn.pressed.connect(func() -> void: menu_action.emit("season_play"))
+	h.add_child(season_play_btn)
+	season_end_btn = _btn("End season", 22)
+	season_end_btn.custom_minimum_size = Vector2(200, 58)
+	season_end_btn.pressed.connect(func() -> void: menu_action.emit("season_end"))
+	h.add_child(season_end_btn)
+	var tb := _btn("Title", 22)
+	tb.custom_minimum_size = Vector2(140, 58)
+	tb.pressed.connect(func() -> void: menu_action.emit("title"))
+	h.add_child(tb)
+	_chain([season_play_btn, season_end_btn, tb] as Array[Button], false)
+
+func show_season(d: Dictionary) -> void:
+	# d: title, sub, rows (Array of [name, w, l, t, pf, pa, mine]), info, play (button text, empty hides it), end (End season text)
+	season_title.text = String(d.get("title", "Season"))
+	season_sub.text = String(d.get("sub", ""))
+	var head: Array = ["Team", "W", "L", "T", "PF", "PA"]
+	for c: int in 6:
+		season_cells[c].text = String(head[c])
+	var rows: Array = d.get("rows", [])
+	for r: int in 4:
+		var row: Array = rows[r] if r < rows.size() else ["", "", "", "", "", "", false]
+		for c: int in 6:
+			var l: Label = season_cells[(r + 1) * 6 + c]
+			l.text = str(row[c])
+			l.add_theme_color_override("font_color", GOLD if bool(row[6]) else Color.WHITE)
+	season_info.text = String(d.get("info", ""))
+	var play: String = String(d.get("play", ""))
+	season_play_btn.visible = play != ""
+	season_play_btn.text = play
+	season_end_btn.text = String(d.get("end", "End season"))
+	show_screen("season")
 
 func set_meter(on: bool, half: float, at: float = 0.72) -> void:
 	# at: how far down the screen the meter sits (0 top, 1 bottom), picked per kick to sit on open grass
@@ -603,10 +901,10 @@ func show_throw(on: bool, labels: PackedStringArray) -> void:
 			throw_btns[i].text = labels[i]
 			throw_btns[i].custom_minimum_size = Vector2(92 if labels[i].length() <= 2 else 150, 66)
 
-func set_pad_labels(a: String, b: String, c: String) -> void:
-	if String(pad.labels.A) == a and String(pad.labels.B) == b and String(pad.labels.C) == c:
+func set_pad_labels(a: String, b: String, c: String, d: String = "") -> void:
+	if String(pad.labels.A) == a and String(pad.labels.B) == b and String(pad.labels.C) == c and String(pad.labels.D) == d:
 		return
-	pad.labels = {"A": a, "B": b, "C": c}
+	pad.labels = {"A": a, "B": b, "C": c, "D": d}
 	pad.queue_redraw()
 
 func say(text: String, secs: float = 2.2, col: Color = Color.WHITE) -> void:
@@ -636,10 +934,10 @@ func clear_just() -> void:
 
 func _btn_centres() -> Dictionary:
 	var s: Vector2 = safe.size
-	return {"A": Vector2(s.x - 110, s.y - 110), "B": Vector2(s.x - 250, s.y - 80), "C": Vector2(s.x - 110, s.y - 250)}
+	return {"A": Vector2(s.x - 110, s.y - 110), "B": Vector2(s.x - 250, s.y - 80), "C": Vector2(s.x - 110, s.y - 250), "D": Vector2(s.x - 260, s.y - 230)}
 
 func _over_gui(pos: Vector2) -> bool:
-	for c: Control in [menu_btn, menu_row, call_panel, help_panel, over_panel, title_panel, team_panel]:
+	for c: Control in [menu_btn, menu_row, call_panel, help_panel, over_panel, title_panel, team_panel, settings_panel, season_panel]:
 		if c.visible and c.get_global_rect().has_point(pos):
 			return true
 	if throw_row.visible:
@@ -652,6 +950,8 @@ func _input(e: InputEvent) -> void:
 	if e is InputEventScreenTouch or e is InputEventScreenDrag:
 		touch_seen = true
 		update_pad()
+	if e is InputEventScreenTouch and (e as InputEventScreenTouch).pressed and not menu_open and not _over_gui((e as InputEventScreenTouch).position):
+		screen_tap.emit()
 	if not pad_active or menu_open:
 		return
 	if e is InputEventScreenTouch:
@@ -706,7 +1006,7 @@ func reset_touch() -> void:
 
 class Pad extends Control:
 	var hud: TTHud
-	var labels: Dictionary = {"A": "Snap", "B": "", "C": ""}
+	var labels: Dictionary = {"A": "Snap", "B": "", "C": "", "D": ""}
 
 	func _draw() -> void:
 		var cs: Dictionary = hud._btn_centres()
@@ -717,10 +1017,14 @@ class Pad extends Control:
 				continue
 			var c: Vector2 = cs[k]
 			var on: bool = hud.btn_held[k]
-			draw_circle(c, 62.0, Color(1, 1, 1, 0.34 if on else 0.16))
-			draw_arc(c, 62.0, 0.0, TAU, 32, Color(1, 1, 1, 0.6), 3.0)
+			var rdy: bool = k != "D" or hud.burst_frac >= 1.0
+			draw_circle(c, 62.0, Color(1, 1, 1, (0.34 if on else 0.16) if rdy else 0.07))
+			draw_arc(c, 62.0, 0.0, TAU, 32, Color(1, 1, 1, 0.6 if rdy else 0.25), 3.0)
+			if k == "D":
+				# the burst fills a gold ring while it charges
+				draw_arc(c, 62.0, -PI / 2.0, -PI / 2.0 + TAU * hud.burst_frac, 32, TTHud.GOLD, 5.0)
 			var w: float = f.get_string_size(t, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
-			draw_string(f, c + Vector2(-w / 2.0, 8.0), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(1, 1, 1, 0.95))
+			draw_string(f, c + Vector2(-w / 2.0, 8.0), t, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(1, 1, 1, 0.95 if rdy else 0.5))
 		var o: Vector2 = hud._stick_origin if hud._stick_id != -1 else Vector2(150.0, size.y - 150.0)
 		draw_circle(o, 80.0, Color(1, 1, 1, 0.1))
 		draw_arc(o, 80.0, 0.0, TAU, 32, Color(1, 1, 1, 0.45), 3.0)

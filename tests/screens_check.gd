@@ -31,6 +31,9 @@ func _initialize() -> void:
 func _run() -> void:
 	var hud: Node = main.get("hud")
 	await create_timer(0.8).timeout
+	main.call("_forget_game")  # no saved game: Exhibition has the focus on the title card
+	main.call("goto_title")
+	await create_timer(0.3).timeout
 	await _press(JOY_BUTTON_A)
 	await create_timer(0.4).timeout
 	_check(int(main.get("state")) == 1, "title: A opens the team screen")
@@ -49,12 +52,21 @@ func _run() -> void:
 	await _press(JOY_BUTTON_A)
 	await create_timer(0.2).timeout
 	_check(int((main.get("save") as Dictionary).mode) == 7, "team screen: A picks 7 on 7")
-	# start a game, then the Menu row: Resume, How to play, ...
+	# start a game, then the Menu row: Resume, Settings, Help, Restart, Title
 	main.call("start_game", 0, true, 1)
 	await create_timer(0.6).timeout
 	await _press(JOY_BUTTON_START)
 	await create_timer(0.3).timeout
 	_check(bool(hud.get("menu_open")), "Menu button opens the Menu")
+	await _press(JOY_BUTTON_DPAD_RIGHT)
+	var set_name: String = _focus_text()
+	await _press(JOY_BUTTON_A)
+	await create_timer(0.3).timeout
+	_check(bool((hud.get("settings_panel") as Control).visible), "Menu row: D-pad to %s, A opens it" % set_name)
+	await _press(JOY_BUTTON_B)
+	await create_timer(0.3).timeout
+	_check(not (hud.get("settings_panel") as Control).visible and bool(hud.get("menu_open")) and _focus_text() == "Resume", "Settings: B goes back to the Menu row")
+	await _press(JOY_BUTTON_DPAD_RIGHT)
 	await _press(JOY_BUTTON_DPAD_RIGHT)
 	var help_name: String = _focus_text()
 	await _press(JOY_BUTTON_A)

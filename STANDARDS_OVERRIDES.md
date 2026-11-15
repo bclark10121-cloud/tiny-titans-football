@@ -4,7 +4,7 @@ Standards: `GAME_STANDARDS.md` (rule ids start with G) and `ENGINEERING_STANDARD
 This file lists where this game does something else, and why. A rule not listed here applies in full.
 Order of authority: Brian in the chat, then this file, then the standards.
 
-Last reviewed: 2026-11-15, with v0.2.0.
+Last reviewed: 2026-11-15, with v0.3.0.
 Checked against: game-standards version 2026-11-15 (commit b2c2865). Shared kit 1.5.0.
 
 On 2026-11-14 Brian told Claude to apply only the standards that fit a sports game and to use its own judgment. Rows agreed under that instruction say "delegated". Brian can change any of them.
@@ -31,11 +31,16 @@ None. All 15 engineering open items from v0.1.0 and the G7.8, E6.7, G10.1 and G1
 
 ## Rules met
 
-Checked by reading the code and the repo against commit b2c2865 of game-standards. The bot games (7 on 7 and 11 on 11), the browser test, the pretend-controller browser test, the headless controller and screens checks, the save store check, a G7.8 check and the page check ran. Nothing was measured on a phone or with a real controller.
+Checked by reading the code and the repo against commit b2c2865 of game-standards. For v0.3.0: the bot games (7 on 7, 11 on 11 and a full season), `tests/qol_check.gd`, the browser test, the pretend-controller browser test, the headless controller and screens checks, the save store check, a G7.8 check and the page check ran. Nothing was measured on a phone or with a real controller.
 
 - Game standards: G0.10 (no standards copies in this repo), G0.12, G1.1 to G1.6, G1.7 (no key or password here, the key lives in `game-signing`), G1.8, G1.9 (`SECRETS check ok`, `signing.properties` and `game-signing/` in `.gitignore`), G1.10 (card on The Game Shelf, footer link to it), G1.11 (no personal names on the game page, the card or the repo description), G2.1 to G2.6, G2.7 (the card is refreshed for v0.2.0 in the same push), G3.1 to G3.5, G4.2, G4.6, G5.1, G5.4, G5.5, G5.6, G6.1, G6.2, G6.3 (v0.2.0 is signed with `wandervalley.jks`, signature `5db69ffb`), G6.4, G6.5, G7.3, G7.4, G7.5, G8.1 to G8.4, G10.2, G10.3 (`COMMON check ok: 1.5.0 b2c2865`), G10.5.
 - Proposed rules the game already follows: G4.8, G4.9, G6.7, G7.6.
 - Engineering standards: E1.1, E1.4, E2.1, E2.2, E2.3, E2.5, E5.1, E6.6. Browser threads off (part of E6.1).
+- Kept in v0.3.0:
+  - G5.8: the new title buttons, Settings and the season screen work with only a controller. B goes back on every screen. The D-pad stays inside each panel. LT is the burst. Checked in `tests/qol_check.gd` and `tests/pad_test.py`.
+  - E6.7: the saved game (Continue) and the season are read with limits on every number. Odd values drop the saved game. Standings that are not 4 whole numbers in range set the season aside. Checked in `tests/qol_check.gd`.
+  - E6.5: the game in progress saves at every play call, kickoff and try, and on pause, focus loss and close.
+  - E1.3: the Burst ring and label redraw only when the charge changes.
 - Fixed in v0.2.0:
   - G5.8: every screen works with only an Xbox controller. `InputSetup.add_controller_ui()` runs at startup. A chooses, B goes back, View and Menu open and close the Menu. Xbox button names everywhere a player reads them. The game page has the Play with an Xbox controller section. `tests/pad_test.py` plays with the kit's pretend controller and prints `errors []`. `tests/controller_check.gd` and `tests/screens_check.gd` check the same headless.
   - G7.8: `window.ttf` and every browser switch (`bot`, `demo`, `fast`, `start_punt`, `start_fg`, `notch`, `eleven`) need the whole-word `?test` flag, read with the kit's `TestBridge`. The Android build reads no switches. A bot run never writes a save.

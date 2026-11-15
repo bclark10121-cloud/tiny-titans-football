@@ -23,15 +23,18 @@ Note: this game has an opponent and a final score. `STANDARDS_OVERRIDES.md` reco
 
 ## Rules
 
-- Top menu: one Menu button at the top right opens all options in a row across the top.
+- Top menu: one Menu button at the top right opens all options in a row across the top: Resume, Settings, Help, Restart, Title.
+- Title card: Continue (only with a saved game), Exhibition, Season and Settings. Settings holds Music, Sound effects, Vibration, Auto pass, Players and Quarter length.
+- Season: 6 weeks against the other 3 teams (`PAIRS` in `main.gd`), then the Title Game for the top 2. Games the player does not play come from `_season_sim`.
+- Burst: F, LT or the touch Burst button. 2 seconds at 1.3 times top speed, 5 seconds to charge. RT, Shift and the Sprint button stay hold-to-sprint. Brian kept LT for the burst on 2026-11-15.
 - 7 on 7 is the default game. 11 on 11 is a choice on the team screen, saved as `mode`. Role order in `OFF_ROLES` and `DEF_ROLES` decides who plays in 7 on 7: the first 7 of each.
 - Xbox controller (G5.8): every screen works with only a controller. `InputSetup.add_controller_ui()` runs at startup. A chooses, B goes back, View and Menu open the Menu. Name buttons by their Xbox labels: View and Menu, never Back or Start.
 - Field units are yards. The field runs along Z. Goal lines sit at z = -50 and z = +50. Side 0 (the player) always attacks +Z and the camera always looks down +Z.
 - Plays are data in `data/plays.json`, written in the offense frame: x is yards to the offense's right, z is yards downfield.
 - Players move with plain maths, not physics bodies. `main.gd` sets `want` and `player.gd` eases toward it.
 - Field lines and numbers are painted into one field texture. Never lay a thin layer on the grass: it flickers on phones.
-- Save file is `user://tiny_titans.json`, format `v: 1`. Only add fields, each with a safe default and a limit in `_load_save()`. It is read and written with `addons/bc_common/save_store.gd` (E6.7).
-- Test hooks stay off for players (G7.8). The browser build publishes `window.ttf` only with the whole-word `?test` flag, through `addons/bc_common/test_bridge.gd`. Every other browser switch (`bot`, `demo`, `fast`, `start_punt`, `start_fg`, `notch`, `eleven`) is read with `TestBridge.has_flag` and only together with `?test`. The Android build reads no switches. Command line switches (`--bot`, `--demo`, `--fast`, `--verbose`, `--games=`, `--seed=`, `--start=`, `--notch=`, `--mode=`) are for desktop and headless runs. A test hook never writes a save outside test mode. A bot run never writes a save.
+- Save file is `user://tiny_titans.json`, format `v: 1`. Only add fields, each with a safe default and a limit in `_load_save()`. It is read and written with `addons/bc_common/save_store.gd` (E6.7). `game` (Continue) and `season` are checked again in `_check_game_save()` and `_check_season_save()`. `sound` is the Sound effects switch and `music` the Music switch.
+- Test hooks stay off for players (G7.8). The browser build publishes `window.ttf` only with the whole-word `?test` flag, through `addons/bc_common/test_bridge.gd`. Every other browser switch (`bot`, `demo`, `fast`, `start_punt`, `start_fg`, `notch`, `eleven`) is read with `TestBridge.has_flag` and only together with `?test`. The Android build reads no switches. Command line switches (`--bot`, `--demo`, `--fast`, `--verbose`, `--season`, `--games=`, `--seed=`, `--start=`, `--notch=`, `--mode=`) are for desktop and headless runs. A test hook never writes a save outside test mode. A bot run never writes a save.
 - Every outside asset goes in `CREDITS.md` with its licence. Music comes from the Patch.gg library (`tools/common/patch_assets.py`).
 
 ## Test gate
@@ -39,6 +42,8 @@ Note: this game has an opponent and a final score. `STANDARDS_OVERRIDES.md` reco
 - `bash tools/common/sync_common.sh --check .` must print `COMMON check ok`.
 - `bash tools/common/check_secrets.sh` must print `SECRETS check ok` (G1.9).
 - `godot --headless --path . -- --bot --games=6` (7 on 7) and the same with `--mode=11` must finish every game and print `BOT done`. Typical final scores sit between 0 and 50 a side in 7 on 7 and between 0 and 40 in 11 on 11.
+- `godot --headless --path . -- --bot --season --games=20` must play 6 weeks and the Title Game and print `BOT season done`.
+- `godot --headless --path . -s res://tests/qol_check.gd` must print `QOL030 check ok` (Settings, season, Continue, Run it again, skip the wait, pause on focus loss, burst).
 - `godot --headless --path . -s res://tests/controller_check.gd` must print `JOY020 check ok`. `godot --headless --path . -s res://tests/screens_check.gd` must print `SCREENS check ok` (G5.8).
 - `python3 tests/web_test.py <web build folder> <shots folder>` must print `errors []`. It opens `index.html?test`. View the screenshots.
 - `python3 tests/pad_test.py <web build folder> <shots folder>` must print `errors []`. It plays with the kit's pretend Xbox controller (G5.8).
@@ -59,7 +64,7 @@ Note: this game has an opponent and a final score. `STANDARDS_OVERRIDES.md` reco
 
 ## Android signing
 
-Every APK is signed with `wandervalley.jks` from `game-signing` (G6.3). v0.1.0 used a throwaway test key, so testers uninstall v0.1.0 once before they install v0.2.0. Later versions install over the old copy.
+Every APK is signed with `wandervalley.jks` from `game-signing` (G6.3). v0.1.0 used a throwaway test key, so testers uninstall v0.1.0 once. From v0.2.0 on, each version installs over the last. The APK asks for the vibration permission (`permissions/vibrate`).
 
 ## Reporting to Brian
 

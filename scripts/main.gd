@@ -4,11 +4,15 @@ extends Node3D
 # Plays and teams are data (data/*.json). Players are drawn by SquadView.
 # Field units are yards. The field runs along Z: goal lines at z = -50 and z = +50. Side 0 (the player) attacks +Z.
 
-const VERSION: String = "0.2.0"
+const VERSION: String = "0.3.0"
 const HALF_W: float = 26.65
 const GOAL: float = 50.0
 const END: float = 60.0
-const QLEN: float = 120.0
+const QLEN: float = 120.0  # default quarter: 2 minutes. Settings picks 1, 2 or 3 (qlen)
+const BURST_T: float = 2.0  # the burst button: 2 seconds of extra speed
+const BURST_CD: float = 7.0  # ready again 5 seconds after a burst ends
+const SEASON_WEEKS: int = 6  # each rival twice, then the Title Game for the top 2
+const PAIRS: Array = [[[0, 1], [2, 3]], [[0, 2], [1, 3]], [[0, 3], [1, 2]]]  # season weeks, repeated
 const SAVE_PATH: String = "user://tiny_titans.json"
 # The first 7 roles on each side play in 7 on 7 (Brian, 2026-11-15): 3 linemen, QB, RB and 2 WR against 3 linemen,
 # 2 linebackers and 2 defensive backs. 11 on 11 adds the last 4.
@@ -25,11 +29,11 @@ const DIFF: Array[Dictionary] = [
 	{"name": "Hard", "tackle": 0.94, "user_speed": 0.98, "qb_err": -0.2, "react": -0.05, "hands": 1.04}]
 const HOT_ORDER: Array[String] = ["", "go", "slant", "out", "curl", "in"]
 const PASS_ACTIONS: Array[String] = ["pass_1", "pass_2", "pass_3", "pass_4"]
-const JUST_ACTIONS: Array[String] = ["act_a", "act_b", "act_x", "act_y", "switch", "hot", "menu", "pass_1", "pass_2", "pass_3", "pass_4",
+const JUST_ACTIONS: Array[String] = ["act_a", "act_b", "act_x", "act_y", "switch", "hot", "menu", "burst", "pass_1", "pass_2", "pass_3", "pass_4",
 	"num_1", "num_2", "num_3", "num_4", "num_5", "num_6", "num_7", "num_8", "num_9"]
 const NUM_KEYS: Array[Key] = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9]
 const LOB_HOLD: float = 0.22
-enum St {TITLE, TEAMSEL, PLAYCALL, PRESNAP, LIVE, DEAD, KICK, OVER}
+enum St {TITLE, TEAMSEL, PLAYCALL, PRESNAP, LIVE, DEAD, KICK, OVER, SEASON}
 
 var state: St = St.TITLE
 var teams: Array = []
@@ -40,6 +44,7 @@ var demo: bool = false  # --demo: the bot plays both sides at normal speed with 
 var post_near: MeshInstance3D  # goal posts at the -Z end, between the camera and the play on drives deep in our end
 var start_at: String = ""  # --start=punt or --start=fg: test switch, opens on fourth down with the ball
 var bot_games: int = 1
+var season_bot: bool = false  # --season: the bot plays a whole season, Title Game included
 var bot_done: int = 0
 var fast: bool = false
 var verbose: bool = false
@@ -64,6 +69,14 @@ var down_n: int = 1
 var first_z: float = -15.0
 var quarter: int = 1
 var clock: float = QLEN
+var qlen: float = QLEN  # this game's quarter length in seconds
+var last_off: String = ""  # Run it again: the offense and defense you called last
+var last_def: String = ""
+var season_game: bool = false  # this game counts in the season
+var title_game: bool = false  # this game is the Title Game
+var boost_t: float = 0.0  # burst seconds left for the player you control
+var boost_cd: float = 0.0  # seconds until the burst is ready again
+var end_armed: bool = false  # End season asks for a second press
 var opening_kicker: int = 0
 var players: Array[Array] = [[], []]  # the players on the field this game: 7 or 11 a side
 var squad: Array[Array] = [[], []]  # all 11 player objects a side. In 7 on 7 the last 4 sit out, hidden
@@ -121,7 +134,14 @@ var crowd: AudioStreamPlayer
 var audio_ok: bool = false
 var just: Dictionary = {}
 var pad_last: bool = false
-var save: Dictionary = {"v": 1, "sound": true, "wins": 0, "losses": 0, "ties": 0, "team": 0, "difficulty": 1, "auto_pass": false, "mode": 7}
+# Save format v 1 (only add fields, each with a safe default and a limit in _load_save). "sound" is the Sound effects switch.
+const GAME0: Dictionary = {"on": false, "season": false, "title": false, "t0": 0, "t1": 1, "mode": 7, "diff": 1, "qlen": 120.0,
+	"s0": 0, "s1": 0, "q": 1, "clock": 120.0, "poss": 0, "los": -25.0, "bx": 0.0, "down": 1, "first": -15.0, "open": 0,
+	"at": "call", "kside": 0, "kyd": -15.0, "y0": 0.0, "y1": 0.0, "to0": 0, "to1": 0, "last_off": "", "last_def": ""}
+const SEASON0: Dictionary = {"on": false, "team": 0, "diff": 1, "week": 0, "w": [0, 0, 0, 0], "l": [0, 0, 0, 0], "t": [0, 0, 0, 0],
+	"pf": [0, 0, 0, 0], "pa": [0, 0, 0, 0], "last": [], "champ": -1}
+var save: Dictionary = {"v": 1, "sound": true, "wins": 0, "losses": 0, "ties": 0, "team": 0, "difficulty": 1, "auto_pass": false, "mode": 7,
+	"music": true, "vibe": true, "qlen": 2, "game": GAME0.duplicate(true), "season": SEASON0.duplicate(true)}
 var diff: Dictionary = {}
 
 func dirv(side: int) -> float:
@@ -164,7 +184,8 @@ func _ready() -> void:
 	add_child(hud)
 	hud.build(VERSION, teams, clampi(int(save.difficulty), 0, 2), plays.formations as Dictionary, (plays.defense_formations as Dictionary).base as Dictionary)
 	hud.start_pressed.connect(_on_start)
-	hud.team_chosen.connect(start_game)
+	hud.team_chosen.connect(_on_team_chosen)
+	hud.screen_tap.connect(func() -> void: just["tap"] = true)
 	hud.play_chosen.connect(_on_play_chosen)
 	hud.menu_action.connect(_on_menu)
 	hud.world_press.connect(_on_world_press)
@@ -175,12 +196,16 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(func() -> void: hud.apply_safe_area(notch))
 	_spawn_players()
 	_apply_sound()
+	hud.set_settings(save)
 	if OS.has_feature("web") or OS.has_feature("mobile"):
 		get_viewport().scaling_3d_scale = 0.85
 		Engine.max_fps = 60
 	loaded = true
 	goto_title()
-	if bot:
+	if bot and season_bot:
+		_season_new(0, 1)
+		_season_play()
+	elif bot:
 		start_game(0, false, 1)
 
 func _parse_args() -> void:
@@ -197,6 +222,8 @@ func _parse_args() -> void:
 			demo = true
 		elif a == "--fast":
 			fast = true
+		elif a == "--season":
+			season_bot = true
 		elif a == "--verbose":
 			verbose = true
 		elif a.begins_with("--games="):
@@ -264,6 +291,7 @@ func _setup_input() -> void:
 	_action("act_x", [_key(KEY_Q), _joy(JOY_BUTTON_X)])
 	_action("act_y", [_key(KEY_R), _joy(JOY_BUTTON_Y)])
 	_action("sprint", [_key(KEY_SHIFT), _axis(JOY_AXIS_TRIGGER_RIGHT, 1.0)])
+	_action("burst", [_key(KEY_F), _axis(JOY_AXIS_TRIGGER_LEFT, 1.0)])  # LT bursts, RT sprints (Brian kept this, 2026-11-15)
 	_action("switch", [_key(KEY_TAB), _joy(JOY_BUTTON_LEFT_SHOULDER)])
 	_action("hot", [_joy(JOY_BUTTON_RIGHT_SHOULDER)])
 	_action("menu", [_key(KEY_ESCAPE), _joy(JOY_BUTTON_START), _joy(JOY_BUTTON_BACK)])
@@ -285,14 +313,10 @@ func _input(e: InputEvent) -> void:
 		_unlock_audio()
 	if e.is_echo():
 		return
-	if e is InputEventJoypadButton and e.is_action_pressed("ui_cancel") and hud:
-		# Xbox B goes back (G5.8): closes How to play, then the Menu
-		if hud.help_panel.visible:
-			_on_menu("help_close")
-			return
-		if hud.menu_open:
-			_on_menu("toggle")
-			return
+	if e is InputEventJoypadButton and e.is_action_pressed("ui_cancel") and hud and hud.any_panel() != "":
+		# Xbox B goes back (G5.8): How to play, Settings, the Menu, then the season, team and end screens
+		_go_back()
+		return
 	for a: String in JUST_ACTIONS:
 		if e.is_action_pressed(a):
 			just[a] = true
@@ -315,7 +339,27 @@ func _notification(what: int) -> void:
 		just["menu"] = true
 	elif what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_APPLICATION_FOCUS_OUT or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		if loaded:
+			# the game pauses when it loses focus: the Menu opens and the clock stops
+			if _in_game() and not hud.menu_open and not bot:
+				hud.set_menu(true)
 			_write_save()
+
+func _in_game() -> bool:
+	return state == St.PLAYCALL or state == St.PRESNAP or state == St.LIVE or state == St.DEAD or state == St.KICK
+
+func _go_back() -> void:
+	# B on a controller, Esc and the Android back button (G5.8)
+	match hud.any_panel():
+		"help":
+			_on_menu("help_close")
+		"settings":
+			_on_menu("settings_close")
+		"menu":
+			_on_menu("toggle")
+		"season", "team", "over":
+			goto_title()
+		_:
+			_on_menu("toggle")
 
 # ---------------------------------------------------------------- world
 
@@ -500,10 +544,17 @@ func _paint_field() -> void:
 # ---------------------------------------------------------------- sound and saves
 
 func _build_audio() -> void:
+	# two buses so Settings turns music and sound effects on and off apart
+	for bus: String in ["Music", "Sfx"]:
+		if AudioServer.get_bus_index(bus) == -1:
+			AudioServer.add_bus()
+			AudioServer.set_bus_name(AudioServer.bus_count - 1, bus)
+			AudioServer.set_bus_send(AudioServer.bus_count - 1, "Master")
 	for n: String in ["whistle", "cheer", "kick", "click", "hit0", "hit1", "hit2"]:
 		var a := AudioStreamPlayer.new()
 		a.stream = load("res://audio/%s.wav" % n)
 		a.volume_db = -4.0
+		a.bus = "Sfx"
 		add_child(a)
 		sfx[n] = a
 	(sfx.click as AudioStreamPlayer).volume_db = -10.0
@@ -512,12 +563,14 @@ func _build_audio() -> void:
 	cs.loop = true
 	crowd.stream = cs
 	crowd.volume_db = -15.0
+	crowd.bus = "Sfx"
 	add_child(crowd)
 	music = AudioStreamPlayer.new()
 	var ms: AudioStreamOggVorbis = load("res://audio/music_title.ogg")
 	ms.loop = true
 	music.stream = ms
 	music.volume_db = -9.0
+	music.bus = "Music"
 	add_child(music)
 
 func _unlock_audio() -> void:
@@ -541,20 +594,74 @@ func play_sfx(n: String) -> void:
 		(sfx[key] as AudioStreamPlayer).play()
 
 func _apply_sound() -> void:
-	AudioServer.set_bus_mute(0, not bool(save.sound))
-	if hud and hud.sound_btn:
-		hud.sound_btn.text = "Sound: On" if bool(save.sound) else "Sound: Off"
-		hud.set_mode(int(save.get("mode", 7)))
-		hud.set_auto_pass(bool(save.get("auto_pass", false)))
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("Music"), not bool(save.music))
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("Sfx"), not bool(save.sound))
+	if hud and hud.set_btns.size() > 0:
+		hud.set_settings(save)
+
+func _buzz(strong: bool) -> void:
+	# Vibration on big hits: the phone buzzes and the controller rumbles. Off in Settings.
+	if bot or not bool(save.vibe):
+		return
+	Input.vibrate_handheld(90 if strong else 40)
+	for d: int in Input.get_connected_joypads():
+		Input.start_joy_vibration(d, 0.4, 0.9 if strong else 0.5, 0.25 if strong else 0.12)
 
 func _load_save() -> void:
 	# Kit save store (E6.7): only known fields of the same kind load, numbers are clamped, a bad file falls back to the backup.
 	store = SaveStore.new(SAVE_PATH)
-	store.limits = {"wins": [0, 100000], "losses": [0, 100000], "ties": [0, 100000], "team": [0, 3], "difficulty": [0, 2], "mode": [7, 11]}
+	store.limits = {"wins": [0, 100000], "losses": [0, 100000], "ties": [0, 100000], "team": [0, 3], "difficulty": [0, 2], "mode": [7, 11], "qlen": [1, 3],
+		"game": {"t0": [0, 3], "t1": [0, 3], "mode": [7, 11], "diff": [0, 2], "qlen": [60, 180], "s0": [0, 999], "s1": [0, 999], "q": [1, 9],
+			"clock": [0, 180], "poss": [0, 1], "los": [-49, 49], "bx": [-6, 6], "down": [1, 4], "first": [-50, 50], "open": [0, 1],
+			"kside": [0, 1], "kyd": [-30, -15], "y0": [-9999, 9999], "y1": [-9999, 9999], "to0": [0, 99], "to1": [0, 99]},
+		"season": {"team": [0, 3], "diff": [0, 2], "week": [0, SEASON_WEEKS + 1], "champ": [-1, 3]}}
 	store.disabled = bot  # test bots never touch the player's save
 	store.load_into(save)
 	if int(save.mode) != 11:
 		save.mode = 7
+	_check_game_save()
+	_check_season_save()
+
+func _check_game_save() -> void:
+	# E6.7: the saved game is untrusted. Anything odd and Continue goes away.
+	var g: Dictionary = save.game
+	if int(g.mode) != 11:
+		g.mode = 7
+	if not (String(g.at) in ["call", "kick", "pat"]) or int(g.t0) == int(g.t1):
+		g.on = false
+	if String(g.last_off) != "" and _find_id("offense", String(g.last_off)).is_empty():
+		g.last_off = ""
+	if String(g.last_def) != "" and _find_id("defense", String(g.last_def)).is_empty():
+		g.last_def = ""
+
+func _check_season_save() -> void:
+	# E6.7: standings are free-form lists in the file. Each must hold 4 whole numbers in range, or the season is set aside.
+	var se: Dictionary = save.season
+	for k: String in ["w", "l", "t", "pf", "pa"]:
+		var a: Variant = se[k]
+		var ok: bool = a is Array and (a as Array).size() == 4
+		if ok:
+			for x: Variant in (a as Array):
+				if not ((x is int or x is float) and is_finite(float(x)) and float(x) >= 0.0 and float(x) <= 9999.0):
+					ok = false
+		if not ok:
+			save.season = SEASON0.duplicate(true)
+			return
+		var clean: Array = []
+		for x: Variant in (a as Array):
+			clean.append(int(x))
+		se[k] = clean
+	var last: Array = []
+	if se.last is Array and (se.last as Array).size() <= 2:
+		for r: Variant in (se.last as Array):
+			if r is Array and (r as Array).size() == 4:
+				var ok2: bool = true
+				for x: Variant in (r as Array):
+					if not ((x is int or x is float) and is_finite(float(x)) and float(x) >= 0.0 and float(x) <= 999.0):
+						ok2 = false
+				if ok2 and int(r[0]) <= 3 and int(r[1]) <= 3:
+					last.append([int(r[0]), int(r[1]), int(r[2]), int(r[3])])
+	se.last = last
 
 func _write_save() -> void:
 	# Kit save store: temp file and rename on Android, browser sync, keeps a backup (E6.4, E6.7).
@@ -588,6 +695,8 @@ func _speed_for(p: TTPlayer) -> float:
 	return s
 
 func _set_ctrl(p: TTPlayer) -> void:
+	if ctrl != null and ctrl != p:
+		ctrl.boost = false
 	ctrl = p
 
 func _nearest_of(list: Array, pos: Vector3) -> TTPlayer:
@@ -625,11 +734,42 @@ func goto_title() -> void:
 	conversion = false
 	off_play = _find("offense", "deep")
 	def_play = _find("defense", "zone")
+	if not bot:
+		mode = 11 if int(save.mode) == 11 else 7  # the title field shows the Players choice
+		_apply_mode()
 	_place_formation()
+	_refresh_title()
+
+func _refresh_title() -> void:
+	# Continue shows when a game is saved. The Season button shows the week of a season in progress.
+	var g: Dictionary = save.game
+	if bool(g.on) and not bot:
+		var qn: String = "overtime" if int(g.q) >= 5 else "quarter %d" % int(g.q)
+		var where: String = "Season game" if bool(g.season) else "Exhibition"
+		hud.set_continue("%s in progress: %s %d, %s %d, %s" % [where, String((teams[int(g.t0)] as Dictionary).abbr), int(g.s0),
+			String((teams[int(g.t1)] as Dictionary).abbr), int(g.s1), qn])
+	else:
+		hud.set_continue("")
+	var se: Dictionary = save.season
+	if bool(se.on) and int(se.week) < SEASON_WEEKS:
+		hud.set_season_btn("Season: week %d" % (int(se.week) + 1))
+	elif bool(se.on) and int(se.week) == SEASON_WEEKS:
+		hud.set_season_btn("Season: Title Game")
+	else:
+		hud.set_season_btn("Season")
+	if state == St.TITLE:
+		hud.show_screen("title")
 
 func _on_start() -> void:
 	state = St.TEAMSEL
+	hud.set_team_mode(false, "Exhibition: four %d-minute quarters against the computer. Ties go to sudden death overtime." % int(save.qlen))
 	hud.show_screen("team")
+
+func _on_team_chosen(team: int, practice_mode: bool, difficulty: int) -> void:
+	if hud.team_season:
+		_season_new(team, difficulty)
+	else:
+		start_game(team, practice_mode, difficulty)
 
 func _apply_mode() -> void:
 	# 7 on 7 or 11 on 11: the players past the mode sit out of the game, hidden below the field.
@@ -666,38 +806,24 @@ func _fit_play(p: Dictionary) -> Dictionary:
 		q.routes = routes
 	return q
 
-func start_game(team: int, practice_mode: bool, difficulty: int) -> void:
+func start_game(team: int, practice_mode: bool, difficulty: int, opp: int = -1, in_season: bool = false) -> void:
 	mode = 11 if (mode_arg == "11" or (mode_arg == "" and not bot and int(save.get("mode", 7)) == 11)) else 7
-	_apply_mode()
-	hud.active_off = OFF_ROLES.slice(0, mode)
-	hud.active_def = DEF_ROLES.slice(0, mode)
 	practice = practice_mode
 	team_idx[0] = team
 	var others: Array[int] = []
 	for i: int in teams.size():
 		if i != team:
 			others.append(i)
-	team_idx[1] = others[randi() % others.size()]
+	team_idx[1] = opp if (opp >= 0 and opp != team) else others[randi() % others.size()]
+	season_game = in_season
+	title_game = in_season and int(save.season.week) >= SEASON_WEEKS
 	if not bot:
 		save.team = team
 		save.difficulty = difficulty
 		diff = DIFF[clampi(difficulty, 0, 2)]
 		_write_save()
-	view.paint([tm(0), tm(1)])
-	_paint_field()
-	score = [0, 0]
-	for s: int in 2:
-		stats[s] = {"yards": 0.0, "to": 0, "plays": 0, "td": 0}
-	events = {"td": 0, "fg": 0, "int": 0, "punt": 0, "sack": 0, "plays": 0, "inc": 0, "comp": 0, "safety": 0, "downs": 0, "fumble": 0,
-		"kickoff": 0, "returns": 0, "ret_td": 0, "touchback": 0, "two_try": 0, "two_good": 0, "xp": 0, "ot": 0, "lob": 0, "pitch": 0, "keep": 0, "read": 0, "auto": 0}
-	quarter = 1
-	clock = QLEN
-	conversion = false
-	hud.show_screen("")
-	hud.set_ingame(true)
-	music.stop()
-	if audio_ok and not bot:
-		crowd.play()
+	qlen = QLEN if bot else float(int(save.qlen)) * 60.0
+	_begin_game()
 	if practice:
 		poss = 0
 		los = -20.0
@@ -717,10 +843,272 @@ func start_game(team: int, practice_mode: bool, difficulty: int) -> void:
 		goto_playcall()
 	else:
 		opening_kicker = randi() % 2
-		hud.say("%s vs %s" % [String(tm(0).name), String(tm(1).name)], 2.5)
+		var head: String = "%s vs %s" % [String(tm(0).name), String(tm(1).name)]
+		if title_game:
+			head = "Title Game: " + head
+		elif season_game:
+			head = "Week %d: %s" % [int(save.season.week) + 1, head]
+		hud.say(head, 2.5)
 		setup_kickoff(opening_kicker, -15.0)
 
+func _begin_game() -> void:
+	# shared by a new game and Continue: field, teams, score and sound for team_idx, mode and qlen
+	_apply_mode()
+	hud.active_off = OFF_ROLES.slice(0, mode)
+	hud.active_def = DEF_ROLES.slice(0, mode)
+	view.paint([tm(0), tm(1)])
+	_paint_field()
+	score = [0, 0]
+	for s: int in 2:
+		stats[s] = {"yards": 0.0, "to": 0, "plays": 0, "td": 0}
+	events = {"td": 0, "fg": 0, "int": 0, "punt": 0, "sack": 0, "plays": 0, "inc": 0, "comp": 0, "safety": 0, "downs": 0, "fumble": 0,
+		"kickoff": 0, "returns": 0, "ret_td": 0, "touchback": 0, "two_try": 0, "two_good": 0, "xp": 0, "ot": 0, "lob": 0, "pitch": 0, "keep": 0, "read": 0, "auto": 0,
+		"burst": 0}
+	quarter = 1
+	clock = qlen
+	conversion = false
+	last_off = ""
+	last_def = ""
+	boost_t = 0.0
+	boost_cd = 0.0
+	hud.set_over_mode(season_game)
+	hud.show_screen("")
+	hud.set_ingame(true)
+	music.stop()
+	if audio_ok and not bot:
+		crowd.play()
+
+# ---------------------------------------------------------------- Continue: the game in progress is saved at each play call, kickoff and try
+
+func _snap_game(at: String, kside: int = 0, kyd: float = -15.0) -> void:
+	if bot or practice:
+		return
+	save.game = {"on": true, "season": season_game, "title": title_game, "t0": team_idx[0], "t1": team_idx[1], "mode": mode,
+		"diff": int(save.difficulty), "qlen": qlen, "s0": score[0], "s1": score[1], "q": quarter, "clock": clock, "poss": poss,
+		"los": los, "bx": ball_x, "down": down_n, "first": first_z, "open": opening_kicker, "at": at, "kside": kside, "kyd": kyd,
+		"y0": float(stats[0].yards), "y1": float(stats[1].yards), "to0": int(stats[0].to), "to1": int(stats[1].to),
+		"last_off": last_off, "last_def": last_def}
+	_write_save()
+
+func _forget_game() -> void:
+	save.game = GAME0.duplicate(true)
+	_write_save()
+	_refresh_title()
+
+func _resume_game() -> void:
+	var g: Dictionary = save.game
+	if not bool(g.on):
+		return
+	mode = int(g.mode)
+	practice = false
+	team_idx[0] = int(g.t0)
+	team_idx[1] = int(g.t1)
+	season_game = bool(g.season) and bool(save.season.on)
+	title_game = season_game and bool(g.title)
+	diff = DIFF[clampi(int(g.diff), 0, 2)]
+	qlen = float(g.qlen)
+	_begin_game()
+	score = [int(g.s0), int(g.s1)]
+	quarter = int(g.q)
+	clock = float(g.clock)
+	opening_kicker = int(g.open)
+	stats[0].yards = float(g.y0)
+	stats[1].yards = float(g.y1)
+	stats[0].to = int(g.to0)
+	stats[1].to = int(g.to1)
+	last_off = String(g.last_off)
+	last_def = String(g.last_def)
+	hud.say("Welcome back", 1.6)
+	match String(g.at):
+		"kick":
+			setup_kickoff(int(g.kside), float(g.kyd))
+		"pat":
+			poss = int(g.poss)
+			los = float(g.los)
+			ball_x = float(g.bx)
+			_start_pat()
+		_:
+			poss = int(g.poss)
+			los = float(g.los)
+			ball_x = float(g.bx)
+			down_n = int(g.down)
+			first_z = float(g.first)
+			goto_playcall()
+
+# ---------------------------------------------------------------- season: 6 weeks against the 3 rivals, then the Title Game
+
+func _season_new(team: int, difficulty: int) -> void:
+	save.season = SEASON0.duplicate(true)
+	save.season.on = true
+	save.season.team = team
+	save.season.diff = difficulty
+	save.difficulty = difficulty
+	save.team = team
+	if bool(save.game.season):
+		save.game = GAME0.duplicate(true)
+	_write_save()
+	_show_season()
+
+func _season_opp(week: int) -> int:
+	var me: int = int(save.season.team)
+	if week < SEASON_WEEKS:
+		for pr: Array in PAIRS[week % 3]:
+			if int(pr[0]) == me:
+				return int(pr[1])
+			if int(pr[1]) == me:
+				return int(pr[0])
+		return -1
+	var top: Array[int] = _season_order()
+	if top[0] == me:
+		return top[1]
+	if top[1] == me:
+		return top[0]
+	return -1
+
+func _season_order() -> Array[int]:
+	# standings: win share, then point difference, then points scored
+	var order: Array[int] = [0, 1, 2, 3]
+	order.sort_custom(_season_before)
+	return order
+
+func _season_key(i: int) -> Array:
+	var se: Dictionary = save.season
+	var gp: int = int(se.w[i]) + int(se.l[i]) + int(se.t[i])
+	var pct: float = (float(se.w[i]) + 0.5 * float(se.t[i])) / float(maxi(1, gp))
+	return [pct, int(se.pf[i]) - int(se.pa[i]), int(se.pf[i]), -i]
+
+func _season_before(a: int, b: int) -> bool:
+	var ka: Array = _season_key(a)
+	var kb: Array = _season_key(b)
+	for j: int in ka.size():
+		if float(ka[j]) != float(kb[j]):
+			return float(ka[j]) > float(kb[j])
+	return false
+
+func _season_sim(a: int, b: int) -> Array[int]:
+	# a game the player does not play: drives that end in a touchdown or a field goal, tilted by team ratings
+	var out: Array[int] = [0, 0]
+	var ta: Dictionary = teams[a]
+	var tb: Dictionary = teams[b]
+	var str_a: float = float(ta.speed) * float(ta.power) * float(ta.hands)
+	var str_b: float = float(tb.speed) * float(tb.power) * float(tb.hands)
+	var base_td: float = 0.42 if int(save.mode) == 7 else 0.28
+	for side: int in 2:
+		var edge: float = (str_a / str_b) if side == 0 else (str_b / str_a)
+		for d: int in 6:
+			var r: float = randf()
+			if r < base_td * edge:
+				out[side] += 7
+			elif r < (base_td + 0.14) * edge:
+				out[side] += 3
+	if out[0] == out[1]:
+		out[randi() % 2] += 3  # overtime field goal
+	return out
+
+func _season_record(my: int, their: int) -> void:
+	# after a season game: the player's result, the other game of the week and the next week
+	var se: Dictionary = save.season
+	var me: int = int(se.team)
+	var opp: int = team_idx[1]
+	var week: int = int(se.week)
+	if week >= SEASON_WEEKS:
+		se.champ = me if my > their else opp
+		se.last = [[me, opp, my, their]]
+		se.week = SEASON_WEEKS + 1
+		_write_save()
+		return
+	_season_add(me, opp, my, their)
+	var last: Array = [[me, opp, my, their]]
+	for pr: Array in PAIRS[week % 3]:
+		var a: int = int(pr[0])
+		var b: int = int(pr[1])
+		if a == me or b == me:
+			continue
+		var r: Array[int] = _season_sim(a, b)
+		_season_add(a, b, r[0], r[1])
+		last.append([a, b, r[0], r[1]])
+	se.last = last
+	se.week = week + 1
+	if int(se.week) == SEASON_WEEKS:
+		var top: Array[int] = _season_order()
+		if top[0] != me and top[1] != me:
+			# the player missed the Title Game: the top 2 play it without us
+			var r2: Array[int] = _season_sim(top[0], top[1])
+			se.champ = top[0] if r2[0] > r2[1] else top[1]
+			se.last = [[top[0], top[1], r2[0], r2[1]]]
+			se.week = SEASON_WEEKS + 1
+	_write_save()
+
+func _season_add(a: int, b: int, sa: int, sb: int) -> void:
+	var se: Dictionary = save.season
+	se.pf[a] = int(se.pf[a]) + sa
+	se.pa[a] = int(se.pa[a]) + sb
+	se.pf[b] = int(se.pf[b]) + sb
+	se.pa[b] = int(se.pa[b]) + sa
+	if sa > sb:
+		se.w[a] = int(se.w[a]) + 1
+		se.l[b] = int(se.l[b]) + 1
+	elif sb > sa:
+		se.w[b] = int(se.w[b]) + 1
+		se.l[a] = int(se.l[a]) + 1
+	else:
+		se.t[a] = int(se.t[a]) + 1
+		se.t[b] = int(se.t[b]) + 1
+
+func _show_season() -> void:
+	state = St.SEASON
+	end_armed = false
+	var se: Dictionary = save.season
+	var me: int = int(se.team)
+	var week: int = int(se.week)
+	var rows: Array = []
+	for i: int in _season_order():
+		rows.append([String((teams[i] as Dictionary).name), int(se.w[i]), int(se.l[i]), int(se.t[i]), int(se.pf[i]), int(se.pa[i]), i == me])
+	var lines: PackedStringArray = PackedStringArray()
+	if (se.last as Array).size() > 0:
+		var parts: PackedStringArray = PackedStringArray()
+		for r: Array in (se.last as Array):
+			parts.append("%s %d, %s %d" % [String((teams[int(r[0])] as Dictionary).abbr), int(r[2]), String((teams[int(r[1])] as Dictionary).abbr), int(r[3])])
+		lines.append(("Title Game: " if week > SEASON_WEEKS else "Last week: ") + ". ".join(parts))
+	var title: String = "Season: %s" % String((teams[me] as Dictionary).name)
+	var sub: String = ""
+	var play: String = ""
+	if week < SEASON_WEEKS:
+		sub = "Week %d of %d" % [week + 1, SEASON_WEEKS]
+		lines.append("This week: %s vs %s" % [String((teams[me] as Dictionary).name), String((teams[_season_opp(week)] as Dictionary).name)])
+		play = "Play week %d" % (week + 1)
+	elif week == SEASON_WEEKS:
+		sub = "Title Game"
+		lines.append("The top 2 play for the title: %s vs %s" % [String((teams[me] as Dictionary).name), String((teams[_season_opp(week)] as Dictionary).name)])
+		play = "Play the Title Game"
+	else:
+		var champ: int = int(se.champ)
+		sub = "Season over"
+		lines.append(("You won the title!" if champ == me else "%s won the title." % String((teams[maxi(champ, 0)] as Dictionary).name)))
+		play = "New season"
+	if bool(save.game.on) and bool(save.game.season):
+		lines.append("This week's game is saved. Play picks it up.")
+	hud.set_ingame(false)
+	hud.show_season({"title": title, "sub": sub, "rows": rows, "info": "\n".join(lines), "play": play, "end": "End season"})
+
+func _season_play() -> void:
+	var se: Dictionary = save.season
+	if int(se.week) > SEASON_WEEKS:
+		state = St.TEAMSEL
+		hud.set_team_mode(true, "Season: %d weeks against the other 3 teams, twice each. The top 2 meet in the Title Game." % SEASON_WEEKS)
+		hud.show_screen("team")
+		return
+	if bool(save.game.on) and bool(save.game.season):
+		_resume_game()
+		return
+	var opp: int = _season_opp(int(se.week))
+	if opp < 0:
+		return
+	hud.show_screen("")
+	start_game(int(se.team), false, int(se.diff), opp, true)
+
 func setup_kickoff(side: int, from_yd: float) -> void:
+	_snap_game("kick", side, from_yd)
 	poss = side
 	los = from_yd * dirv(side)
 	ball_x = 0.0
@@ -778,9 +1166,17 @@ func _update_hud() -> void:
 	hud.burst_bar.visible = state == St.LIVE and ctrl != null
 	if ctrl:
 		hud.burst_bar.value = ctrl.burst
+	hud.set_burst(1.0 - boost_cd / BURST_CD, state == St.LIVE and ctrl != null)
 
 func fg_dist() -> float:
 	return (GOAL - los * dirv(poss)) + 17.0
+
+func _find_id(list: String, id: String) -> Dictionary:
+	# like _find, but empty when the id is unknown (checks ids read from the save)
+	for p: Dictionary in plays[list]:
+		if String(p.id) == id:
+			return p
+	return {}
 
 func _find(list: String, id: String) -> Dictionary:
 	for p: Dictionary in plays[list]:
@@ -818,6 +1214,8 @@ func goto_playcall() -> void:
 	if bot:
 		_resolve_cpu_call()
 		return
+	if not conversion:
+		_snap_game("call")
 	var d: float = dirv(poss)
 	var togo: float = (first_z - los) * d
 	if poss == 0:
@@ -837,9 +1235,12 @@ func goto_playcall() -> void:
 			t["Kick"] = kicks
 			order.append("Kick")
 		var start: String = "Run" if togo <= 2.0 else "Short"
+		var again: Dictionary = _find_id("offense", last_off) if last_off != "" else {}
+		if not again.is_empty():
+			start = String(again.cat).capitalize()  # Run it again: open on the last play
 		if down_n == 4 and kicks.size() > 0 and togo > 3.0:
 			start = "Kick"
-		hud.show_call("%s. Pick a play" % _dd_text(), t, order, start)
+		hud.show_call("%s. Pick a play" % _dd_text(), t, order, start, last_off)
 		hud.hint.text = "Tap a play or press its number. Change tabs: Q and E, or LB and RB"
 	else:
 		var c: Variant = _cpu_off_choice()
@@ -851,7 +1252,10 @@ func goto_playcall() -> void:
 		for p: Dictionary in plays.defense:
 			(td[String(p.cat).capitalize()] as Array).append(_card(p, "def"))
 		var dstart: String = "Run" if togo <= 2.0 else ("Zone" if togo >= 8.0 else "Man")
-		hud.show_call("Defense. %s" % _dd_text(), td, PackedStringArray(["Man", "Zone", "Blitz", "Run"]), dstart)
+		var dagain: Dictionary = _find_id("defense", last_def) if last_def != "" else {}
+		if not dagain.is_empty():
+			dstart = String(dagain.cat).capitalize()
+		hud.show_call("Defense. %s" % _dd_text(), td, PackedStringArray(["Man", "Zone", "Blitz", "Run"]), dstart, last_def)
 		hud.hint.text = "Tap a defense or press its number. Change tabs: Q and E, or LB and RB"
 
 func _playcall_input() -> void:
@@ -949,9 +1353,11 @@ func _on_play_chosen(id: String) -> void:
 	for p: Dictionary in plays.offense:
 		if String(p.id) == id:
 			off_play = p
+			last_off = id
 	for p: Dictionary in plays.defense:
 		if String(p.id) == id:
 			def_play = p
+			last_def = id
 	setup_play()
 
 func _do_special(id: String) -> void:
@@ -1433,6 +1839,7 @@ func _fumble(at: Vector3) -> void:
 	carrier = null
 	events.fumble += 1
 	hud.say("LOOSE BALL!", 1.2, hud.GOLD)
+	_buzz(true)
 
 # ---------------------------------------------------------------- input during play
 
@@ -1514,22 +1921,49 @@ func _on_menu(action: String) -> void:
 		"click":
 			play_sfx("click")
 		"toggle":
-			if state == St.TITLE or state == St.TEAMSEL or state == St.OVER:
+			if not _in_game():
 				return
 			hud.set_menu(not hud.menu_open)
+			if not hud.menu_open:
+				_refocus()
 		"resume":
 			hud.set_menu(false)
+			_refocus()
 		"help":
 			hud.show_help(true)
 		"help_close":
 			hud.show_help(false)
-		"sound":
+			_refocus()
+		"settings":
+			hud.set_settings(save)
+			hud.show_settings(true)
+		"settings_close":
+			hud.show_settings(false)
+			_refocus()
+		"music":
+			save.music = not bool(save.music)
+			_apply_sound()
+			_write_save()
+		"sfx":
 			save.sound = not bool(save.sound)
 			_apply_sound()
 			_write_save()
+		"vibe":
+			save.vibe = not bool(save.vibe)
+			hud.set_settings(save)
+			_write_save()
+			_buzz(false)
+		"players":
+			save.mode = 11 if int(save.mode) == 7 else 7
+			hud.set_settings(save)
+			_write_save()
+		"qlen":
+			save.qlen = int(save.qlen) % 3 + 1
+			hud.set_settings(save)
+			_write_save()
 		"mode7", "mode11":
 			save.mode = 7 if action == "mode7" else 11
-			hud.set_mode(int(save.mode))
+			hud.set_settings(save)
 			_write_save()
 		"autopass":
 			save.auto_pass = not bool(save.get("auto_pass", false))
@@ -1537,10 +1971,43 @@ func _on_menu(action: String) -> void:
 			_write_save()
 		"restart":
 			hud.set_menu(false)
-			start_game(team_idx[0], practice, int(save.difficulty))
+			start_game(team_idx[0], practice, int(save.difficulty), team_idx[1] if season_game else -1, season_game)
 		"title":
 			hud.set_menu(false)
 			goto_title()
+		"continue":
+			_resume_game()
+		"season":
+			if bool(save.season.on):
+				_show_season()
+			else:
+				state = St.TEAMSEL
+				hud.set_team_mode(true, "Season: %d weeks against the other 3 teams, twice each. The top 2 meet in the Title Game." % SEASON_WEEKS)
+				hud.show_screen("team")
+		"season_show":
+			_show_season()
+		"season_play":
+			_season_play()
+		"season_end":
+			# two presses: the first asks, the second ends the season
+			if not end_armed:
+				end_armed = true
+				hud.season_end_btn.text = "Press again to end"
+			else:
+				save.season = SEASON0.duplicate(true)
+				if bool(save.game.season):
+					save.game = GAME0.duplicate(true)
+				_write_save()
+				goto_title()
+
+func _refocus() -> void:
+	# after a panel closes, the focus goes back to where the player was (G5.8: the focused button is visible)
+	if hud.menu_open and hud.menu_row.get_child_count() > 0:
+		(hud.menu_row.get_child(0) as Button).grab_focus.call_deferred()
+	elif hud.call_panel.visible:
+		hud.select_tab(hud.cur_tab)  # back on the play card the player had
+	elif state == St.TITLE:
+		hud.show_screen("title")
 
 # ---------------------------------------------------------------- loop
 
@@ -1564,24 +2031,25 @@ func _process(delta: float) -> void:
 		bridge.tick(delta, _test_state, 0.0)
 
 func _test_state() -> Dictionary:
-	return {"phase": state, "state": state, "poss": poss, "down": down_n, "q": quarter, "clock": int(clock), "s0": score[0], "s1": score[1],
+	return {"phase": state, "state": state, "poss": poss, "week": int(save.season.week), "season_on": bool(save.season.on),
+		"cont": bool(save.game.on), "settings": hud.settings_panel.visible, "boost": boost_t > 0.0, "qlen": int(qlen), "down": down_n, "q": quarter, "clock": int(clock), "s0": score[0], "s1": score[1],
 		"ball": ball_state, "kind": play_kind, "ret": returning, "ctrl": (ctrl.role if ctrl else ""), "mode": mode,
 		"dc": int(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)),
 		"tris": int(Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)),
 		"vram": int(Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0),
 		"conv": conversion, "tabs": (",".join(hud.tab_names) if hud.call_panel.visible else ""), "audible": audible_open,
+		"tab": (hud.tab_names[hud.cur_tab] if hud.call_panel.visible and hud.cur_tab < hud.tab_names.size() else ""),
 		"menu": hud.menu_open, "help": hud.help_panel.visible, "fps": int(Engine.get_frames_per_second())}
 
 func tick(dt: float) -> void:
 	if bool(just.get("menu", false)) and not bot:
-		if hud.help_panel.visible:
-			hud.show_help(false)
-		else:
-			_on_menu("toggle")
-	if hud.menu_open or hud.help_panel.visible:
+		_go_back()
+	if hud.menu_open or hud.help_panel.visible or hud.settings_panel.visible:
 		just.clear()
 		hud.clear_just()
 		return
+	boost_t = maxf(0.0, boost_t - dt)
+	boost_cd = maxf(0.0, boost_cd - dt)
 	match state:
 		St.PLAYCALL:
 			_playcall_input()
@@ -1807,6 +2275,12 @@ func _user_live(u: TTPlayer, d: float) -> void:
 	var mv: Vector2 = _move_input()
 	var wdir := Vector3(-mv.x, 0.0, mv.y)
 	u.sprinting = _sprint_held()
+	if (bool(just.get("burst", false)) or bool(hud.btn_just.D)) and boost_cd <= 0.0 and not u.down:
+		# the burst button: 2 seconds of extra speed, ready again 5 seconds after it ends
+		boost_t = BURST_T
+		boost_cd = BURST_CD
+		events.burst += 1
+	u.boost = boost_t > 0.0
 	var sp: float = u.speed_now()
 	if u.engaged != null:
 		sp *= 0.2
@@ -2247,6 +2721,8 @@ func _try_tackle(q: TTPlayer) -> void:
 		p += 0.15
 	if bc.sprinting and bc.burst > 0.0:
 		p -= 0.04
+	if bc.boost:
+		p -= 0.06
 	if human():
 		if bc == ctrl:
 			p -= 0.05
@@ -2258,6 +2734,8 @@ func _try_tackle(q: TTPlayer) -> void:
 		bc.fall(4.0)
 		q.fall(0.8)
 		play_sfx("hit")
+		if bc == ctrl or q == ctrl:
+			_buzz(bc.role == "QB" and play_kind == "scrim")
 		if randf() < 0.012 and bc.role != "QB" and not conversion:
 			_fumble(bc.position)
 		else:
@@ -2549,6 +3027,9 @@ func _flip(spot_z: float, x: float) -> void:
 
 func _dead(dt: float) -> void:
 	dead_t -= dt * (6.0 if bot else 1.0)
+	# skip the wait after a play: A, Space or a tap moves on once half a second has passed
+	if not bot and dead_t > 0.0 and dead_t < 1.8 and (_a_just() or bool(just.get("tap", false))):
+		dead_t = 0.0
 	if dead_t > 0.0:
 		return
 	for side: int in 2:
@@ -2563,16 +3044,22 @@ func _dead(dt: float) -> void:
 	if not practice and clock <= 0.0:
 		if quarter == 4 and score[0] == score[1]:
 			quarter = 5
-			clock = QLEN
+			clock = qlen
 			events.ot += 1
 			pending = "kick%d" % (randi() % 2)
 			hud.say("Overtime. Next score wins", 2.4, hud.GOLD)
+		elif quarter >= 5 and title_game and score[0] == score[1]:
+			# the Title Game needs a winner: another overtime period
+			quarter += 1
+			clock = qlen
+			pending = "kick%d" % (randi() % 2)
+			hud.say("Another overtime. Next score wins", 2.4, hud.GOLD)
 		elif quarter >= 4:
 			_game_over()
 			return
 		else:
 			quarter += 1
-			clock = QLEN
+			clock = qlen
 			if quarter == 3:
 				pending = "kick%d" % (1 - opening_kicker)
 				hud.say("Halftime", 2.0)
@@ -2591,6 +3078,7 @@ func _dead(dt: float) -> void:
 	goto_playcall()
 
 func _start_pat() -> void:
+	_snap_game("pat")
 	var scorer: int = poss
 	if human() and scorer == 0:
 		state = St.PLAYCALL
@@ -2631,18 +3119,43 @@ func _game_over() -> void:
 		save.losses = int(save.losses) + 1
 	else:
 		save.ties = int(save.ties) + 1
+	if not bot:
+		save.game = GAME0.duplicate(true)  # the game is over: nothing to continue
+	var season_line: String = ""
+	if season_game and not practice:
+		var was_title: bool = title_game
+		_season_record(score[0], score[1])
+		var se: Dictionary = save.season
+		if was_title:
+			season_line = "You won the title!" if score[0] > score[1] else "%s won the title." % String(tm(1).name)
+		elif int(se.week) > SEASON_WEEKS:
+			season_line = "Season over. %s won the title." % String((teams[maxi(int(se.champ), 0)] as Dictionary).name)
+		elif int(se.week) == SEASON_WEEKS:
+			season_line = "You made the Title Game!"
+		else:
+			season_line = "Season record: %d-%d-%d" % [int(se.w[int(se.team)]), int(se.l[int(se.team)]), int(se.t[int(se.team)])]
 	_write_save()
 	if bot:
 		bot_done += 1
 		print("BOT game %d final %d-%d plays %d yards %d/%d events %s" % [bot_done, score[0], score[1], events.plays, int(stats[0].yards), int(stats[1].yards), JSON.stringify(events)])
-		if bot_done >= bot_games:
+		if season_game:
+			var se2: Dictionary = save.season
+			print("BOT season week %d record %d-%d-%d champ %d" % [int(se2.week), int(se2.w[int(se2.team)]), int(se2.l[int(se2.team)]), int(se2.t[int(se2.team)]), int(se2.champ)])
+		if bot_done >= bot_games or (season_bot and int(save.season.week) > SEASON_WEEKS):
+			if season_bot:
+				print("BOT season done champ %s" % String((teams[maxi(int(save.season.champ), 0)] as Dictionary).name))
 			print("BOT done games %d" % bot_done)
 			get_tree().quit()
+		elif season_bot:
+			_season_play()
 		else:
 			start_game(bot_done % 4, false, 1)
 		return
 	var t: String = "%s %d\n%s %d\n\n%s\n\nYards: %d to %d    Turnovers: %d to %d\nYour record: %d wins, %d losses, %d ties" % [String(tm(0).name), score[0], String(tm(1).name), score[1], res,
 		int(stats[0].yards), int(stats[1].yards), int(stats[0].to), int(stats[1].to), int(save.wins), int(save.losses), int(save.ties)]
+	if season_line != "":
+		t += "\n" + season_line
+	_refresh_title()
 	play_sfx("cheer")
 	hud.show_over(t)
 	crowd.stop()
@@ -2837,9 +3350,9 @@ func _update_tags() -> void:
 	hud.show_throw(labels.size() > 0, labels)
 	if state == St.LIVE and ctrl != null:
 		if ctrl.side == "off":
-			hud.set_pad_labels("Sprint", "Pitch" if (ctrl == carrier and _pitch_open()) else "Juke", "Dive")
+			hud.set_pad_labels("Sprint", "Pitch" if (ctrl == carrier and _pitch_open()) else "Juke", "Dive", "Burst")
 		else:
-			hud.set_pad_labels("Switch", "", "Tackle")
+			hud.set_pad_labels("Switch", "", "Tackle", "Burst")
 	elif state == St.KICK or (state == St.PRESNAP and is_kick_play()):
 		hud.set_pad_labels("Kick" if poss == 0 else "", "", "")
 	elif state == St.PRESNAP:

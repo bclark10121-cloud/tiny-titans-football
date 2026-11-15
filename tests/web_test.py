@@ -39,13 +39,31 @@ async def main():
                 seen.add(n); await r.shot(n)
             async def key(k, wait=350): await pg.keyboard.press(k); await pg.wait_for_timeout(wait)
             await wait_state([TITLE], 60); await pg.wait_for_timeout(1200); await shot("01_title")
+            # v0.3.0: Settings and the season screen from the title card, with the keyboard
+            await key("ArrowRight"); await key("ArrowRight"); await key("Enter", 600)
+            s = await st(); await shot("02d_settings")
+            r.checks.append("%s Settings opens from the title card" % ("ok  " if s and s.get("settings") else "FAIL"))
+            await key("Escape", 500)
+            await key("ArrowRight"); await key("Enter", 600); await shot("02b_season_team")
+            await key("Enter", 800); s = await st(); await shot("02c_season")
+            r.checks.append("%s a season starts and shows week 1" % ("ok  " if s and s.get("season_on") and s.get("week") == 0 and s.get("state") == 8 else "FAIL"))
+            await key("Escape", 600)
+            s = await st()
+            r.checks.append("%s Esc goes back to the title" % ("ok  " if s and s.get("state") == TITLE else "FAIL"))
             await key("Enter"); await wait_state([TEAMSEL]); await pg.wait_for_timeout(600); await shot("02_teams")
             await key("Enter")
             off_calls = 0; t0 = time.time(); plays = 0; mode = "pass"; auto_on = False
             async def toggle_auto(tag):
-                # Menu, then the Auto pass button in the top row, then close the menu
-                await key("Escape", 600); await pg.mouse.click(882, 38); await pg.wait_for_timeout(500)
-                await shot(tag); await key("Escape", 500)
+                # Menu, Settings, Auto pass (4th button), then back out with Esc twice
+                await key("Escape", 600); await key("ArrowRight", 300); await key("Enter", 600)
+                for _ in range(3): await key("ArrowDown", 200)
+                await key("Enter", 500); await shot(tag); await key("Escape", 500); await key("Escape", 500)
+            async def goto_tab(name):
+                # the play call opens on the last play's tab (Run it again), so find the tab by name
+                for _ in range(6):
+                    s2 = await st()
+                    if not s2 or s2.get("tab") == name: return
+                    await key("e", 300)
             while time.time() - t0 < 230 and plays < 26:
                 s = await st()
                 if not s: await pg.wait_for_timeout(200); continue
@@ -74,11 +92,11 @@ async def main():
                             await toggle_auto("18b_auto_off_menu"); auto_on = False
                         choice = off_calls % 4
                         mode = ["pass", "run", "option", "auto"][choice]
-                        if choice == 1: await key("e"); await key("e")   # run tab
-                        if choice == 2:
-                            await key("e"); await key("e"); await key("e"); await shot("21_option_tab")   # option tab
                         if choice == 3:
                             await toggle_auto("18_auto_on_menu"); auto_on = True
+                        await goto_tab(["Short", "Run", "Option", "Short"][choice])
+                        if choice == 2: await shot("21_option_tab")
+                        if off_calls >= 4: await shot("22_run_it_again")
                         await key("1", 500); off_calls += 1
                     else:
                         await pg.wait_for_timeout(500); await shot("10_playcall_defense"); await key("3" if off_calls % 2 else "1", 400)
@@ -115,7 +133,10 @@ async def main():
                             else:
                                 await key("2", 100)
                         else:
-                            await pg.keyboard.down("w"); await pg.wait_for_timeout(700); await shot("09_run"); await pg.keyboard.up("w")
+                            await pg.keyboard.down("w"); await pg.wait_for_timeout(300); await key("f", 150)
+                            s = await st(); await pg.wait_for_timeout(250); await shot("09_run")
+                            if s and s.get("state") == LIVE: notes.append("burst on F: %s" % s.get("boost"))
+                            await pg.keyboard.up("w")
                         await pg.keyboard.down("w")
                         await wait_state([DEAD, KICK, PLAYCALL, OVER], 40); await pg.keyboard.up("w")
                     else:
