@@ -1,13 +1,13 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-15 for v0.2.0. Brian decides the order.
+Updated 2026-11-15 after v0.2.0. Brian decides the order.
 
 ## Done
 
 ### v0.2.0
 
 - 7 on 7 is the default game (asked for by Brian). Offense: 3 linemen, a QB, a running back and 2 receivers. Defense: 3 linemen, 2 linebackers and 2 defensive backs. Full 100-yard field. Kickoffs and punts are 7 a side too.
-- 11 on 11 stays a choice. Players on the team screen and in the Menu. Saved on the device.
+- 11 on 11 stays a choice. Players on the team screen. Saved on the device.
 - Full Xbox controller support (G5.8). Every screen works with only a controller. A chooses, B goes back, View or Menu opens the Menu. The game page has a section on pairing an Xbox controller.
 - Kickoffs and punts you play, with a kicker, a timing meter and returns. Touchbacks, muffed punts and safeties with a free kick.
 - Interceptions and fumbles are live. Run them back for a score.
@@ -43,8 +43,18 @@ Updated 2026-11-15 for v0.2.0. Brian decides the order.
 
 ## Next (planned for v0.3.0)
 
-1. Burst button (asked for by Brian, 2026-11-15). A touch button that gives a burst of speed for 2 seconds. Today sprint is a hold: Shift on a keyboard, RT on a controller, the Sprint button on touch. Assumptions to confirm: the burst can be used again after 5 seconds, hold-to-sprint stays, and keyboard and controller get the burst on a key and a button too.
+Brian's v0.2.0 playtest notes come first and outrank this list.
+
+1. Burst button (asked for by Brian, 2026-11-15). A touch button that gives a burst of speed for 2 seconds. Today sprint is a hold: Shift on a keyboard, RT on a controller, the Sprint button on touch. Assumptions to confirm: the burst works again after 5 seconds, hold-to-sprint stays, and keyboard and controller get the burst on a key and a button too.
 2. Season mode with standings and a playoff. Brian picked it for v0.2.0. It moved here so v0.2.0 could ship.
+3. Quality of life. Picked by Claude on 2026-11-15 at Brian's request. In build order:
+   1. Continue a game. The game keeps the score, clock, quarter, down, ball spot, teams and settings when the app goes to the background or closes. The title shows Continue. Why: if Android closes the app in the background, the game in progress is lost today. Season mode needs the same save. Size: medium.
+   2. Pause when the game loses focus. The Menu opens and the clock stops when the app or browser tab loses focus mid-game. Why: today a pulled-down notification shade or a click in another window lets the play run on. Size: small.
+   3. Skip the wait after a play. After the whistle the game waits 2.3 seconds. A, Space or a tap moves on after half a second. Why: quick downs are a pillar. Size: small.
+   4. Run it again. The play call opens on the tab of your last play, with its card highlighted and marked Last. One press calls it again. Fourth down still opens the Kick tab. Why: arcade players repeat plays that work. Today the play call opens on Short, Run or Kick by down and distance. Size: small.
+   5. Settings panel. The Menu gets one Settings button with Music, Sound effects, Auto pass, Players (7 on 7 or 11 on 11), Quarter length (1, 2 or 3 minutes) and Vibration. Why: today one Sound switch turns off both music and effects. Players only shows on the team screen. Quarter length lets a game run about 5 to 15 minutes. The Menu row also gets shorter. Size: medium.
+   6. Vibration on big hits. A short buzz on the phone and a rumble on the controller for tackles, sacks and big hits, with the switch in Settings. On by default. Why: big hits are a pillar. Size: small.
+   7. Clearer switches on the team screen (was idea 13). Practice mode and Auto pass show On or Off in words. Size: small.
 
 ## Asked for by Brian, not built yet
 
@@ -65,8 +75,9 @@ Updated 2026-11-15 for v0.2.0. Brian decides the order.
 10. Spectate mode: the computer plays both sides. The `--demo` test switch already does this.
 11. More music from Patch.gg for menus and halftime.
 12. Onside kicks.
-13. Clearer checkboxes on the team screen.
-14. 7 on 7 playbook: plays drawn for 7 a side. Today 7 on 7 uses the 11 on 11 plays with the extra players taken out.
+13. 7 on 7 playbook: plays drawn for 7 a side. Today 7 on 7 uses the 11 on 11 plays with the extra players taken out.
+14. Open receiver colours. Each receiver's button label turns green when open and red when covered. A help for new players.
+15. Box score at the end of the game: passing and rushing yards, completions and the longest play. Today the end screen shows total yards and turnovers.
 
 ## Later
 
@@ -96,6 +107,7 @@ Updated 2026-11-15 for v0.2.0. Brian decides the order.
 - 2026-11-15: Tag line is "Arcade 7 on 7 and 11 on 11 football".
 - 2026-11-15: Every release updates The Game Shelf card with every relevant change, in the same push.
 - 2026-11-15: Xbox controller support per G5.8, with Xbox button names and a pretend-controller browser test.
+- 2026-11-15: Claude picks the quality of life items for v0.3.0 (Brian: "use your best judgement").
 
 ## Judgment calls made in v0.2.0 (Brian to confirm or change)
 

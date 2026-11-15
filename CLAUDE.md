@@ -24,7 +24,7 @@ Note: this game has an opponent and a final score. `STANDARDS_OVERRIDES.md` reco
 ## Rules
 
 - Top menu: one Menu button at the top right opens all options in a row across the top.
-- 7 on 7 is the default game. 11 on 11 is a choice on the team screen and in the Menu, saved as `mode`. Role order in `OFF_ROLES` and `DEF_ROLES` decides who plays in 7 on 7: the first 7 of each.
+- 7 on 7 is the default game. 11 on 11 is a choice on the team screen, saved as `mode`. Role order in `OFF_ROLES` and `DEF_ROLES` decides who plays in 7 on 7: the first 7 of each.
 - Xbox controller (G5.8): every screen works with only a controller. `InputSetup.add_controller_ui()` runs at startup. A chooses, B goes back, View and Menu open the Menu. Name buttons by their Xbox labels: View and Menu, never Back or Start.
 - Field units are yards. The field runs along Z. Goal lines sit at z = -50 and z = +50. Side 0 (the player) always attacks +Z and the camera always looks down +Z.
 - Plays are data in `data/plays.json`, written in the offense frame: x is yards to the offense's right, z is yards downfield.
