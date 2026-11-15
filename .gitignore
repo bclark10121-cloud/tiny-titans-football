@@ -1,0 +1,6 @@
+.godot/
+*.apk
+*.aab
+*.jks
+*.keystore
+!docs/downloads/*.apk

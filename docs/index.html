@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tiny Titans Football</title><link rel="icon" href="icon.png">
+<meta name="description" content="Tiny Titans Football is an arcade 11 on 11 football game for Android and the browser. Call a play, then run it.">
+<style>
+:root{--ink:#16222b;--accent:#1f6f5c;--gold:#c9961a;--card:#ffffff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(#bfe0c8 0%,#eaf2ee 45%,#f3ecd6 100%) fixed;color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:860px;margin:0 auto;padding:36px 20px 60px}
+header{text-align:center}
+h1{font-family:Impact,"Arial Black",system-ui,sans-serif;font-size:clamp(38px,8vw,62px);letter-spacing:2px;margin:14px 0 0;color:var(--accent);text-transform:uppercase}
+.tag{letter-spacing:4px;text-transform:uppercase;font-size:12px;opacity:.8;margin:4px 0 22px}
+.lead{font-size:18px;max-width:640px;margin:0 auto 24px;text-wrap:balance}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+a.btn{display:inline-block;padding:13px 22px;border-radius:12px;font-weight:700;text-decoration:none;border:1px solid rgba(0,0,0,.25)}
+a.primary{background:var(--accent);color:#fff}a.ghost{background:rgba(255,255,255,.7);color:var(--ink)}
+a.btn:focus-visible{outline:3px solid #16222b;outline-offset:2px}
+.note{font-size:13px;opacity:.8;text-align:center}.note a{color:inherit}
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:34px 0}
+.shots img{width:100%;border-radius:14px;border:1px solid rgba(22,34,43,.2);display:block}
+h2{font-family:Impact,"Arial Black",system-ui,sans-serif;letter-spacing:1px;color:var(--accent);font-size:24px;margin:34px 0 10px;font-weight:400}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid rgba(22,34,43,.14);border-radius:14px;padding:14px 16px}
+.card b{color:var(--accent)}ol,ul{padding-left:20px;margin:6px 0}footer{margin-top:40px;font-size:13px;opacity:.7;text-align:center}footer a{color:inherit}
+@media (max-width:560px){.shots{grid-template-columns:1fr 1fr}.shots img:last-child{display:none}}
+</style></head><body><main>
+<header><h1>Tiny Titans Football</h1><div class="tag">Arcade 11 on 11 football</div>
+<p class="lead">Call a play, then run it. Throw to four receivers, juke past tacklers, pick a defense and chase down the ball. Four fictional teams, four 2-minute quarters and one loud stadium.</p>
+<div class="cta"><a class="btn primary" href="play/">Play in your browser</a><a class="btn ghost" href="downloads/TinyTitansFootball-v0.1.0.apk">Download for Android (APK)</a></div>
+<p class="note">Version 0.1.0, first test build. <a href="release-notes/v0.1.0.md">Release notes</a> · <a href="https://github.com/bclark10121-cloud/tiny-titans-football/blob/main/BACKLOG.md">Backlog</a> · <a href="https://github.com/bclark10121-cloud/tiny-titans-football">Source on GitHub</a></p></header>
+<div class="shots"><img src="shot-pass.jpg" alt="A pass play with four numbered receivers running routes"><img src="shot-plays.jpg" alt="The play call screen with eight offensive plays"><img src="shot-defense.jpg" alt="Playing defense against the computer's offense"></div>
+<h2>What kind of game is this?</h2>
+<div class="grid">
+<div class="card"><b>Call it, then run it.</b> Pick from 8 offensive plays and 4 defenses. The snap hands you control.</div>
+<div class="card"><b>Arcade pace.</b> Big hits, fast players and quick downs. A full game takes about 10 minutes.</div>
+<div class="card"><b>Real football rules.</b> Four downs, first downs, touchdowns, field goals, punts, safeties and turnovers.</div>
+<div class="card"><b>All original.</b> Fictional teams and our own plays and art. No real leagues, teams or players.</div>
+</div>
+<h2>Things to do</h2>
+<ul><li>Play a full exhibition game against the computer.</li><li>Pick one of four teams: Ironwood Otters, Harbor City Comets, Red Mesa Rattlers or Summit Yetis.</li><li>Throw Quick Slants, Go Deep, Sideline Outs and Crossers.</li><li>Run the Inside Dive, Off Tackle and both Sweeps.</li><li>Call Man Cover, Zone Cover, Blitz or Run Stuff on defense.</li><li>Kick field goals and extra points with a timing meter.</li><li>Use Practice mode to try every play with no clock and no score.</li></ul>
+<h2>Controls</h2>
+<ul><li>Keyboard: WASD or arrows move. Space snaps and sprints. 1 to 4 pass. E juke. Q dive or tackle. Tab switch defender. Esc menu.</li><li>Controller: left stick moves. A snaps and sprints. A, B, X, Y pass. B juke. X dive or tackle. RT sprint. LB switch defender. Start menu.</li><li>Touch: drag on the left to move. Buttons on the right. Tap a receiver or a number button to pass.</li></ul>
+<h2>Install on Android</h2>
+<ol><li>Tap <b>Download for Android</b>.</li><li>Open the downloaded file.</li><li>If Android asks, allow installs from this source.</li><li>Tap Install, then open the game.</li></ol>
+<p class="note">Android may show a Play Protect notice for apps from outside the Play Store. This first build is signed with a test key, so a later build may ask you to uninstall this one first.</p>
+<h2>Feedback wanted</h2>
+<ul><li>How running, passing and tackling feel</li><li>Whether the camera sits at the right height and distance</li><li>Whether the computer is too easy or too hard</li><li>Any play that works every time</li><li>Your phone model if you see lag</li></ul>
+<footer>Made by Brian Clark. Early test build, so expect rough edges. Music: "Rock on Chicago" by Kevin MacLeod (incompetech.com), CC BY 4.0. Hit sounds by Kenney (CC0). Both found through Patch.gg. <a href="https://github.com/bclark10121-cloud/tiny-titans-football/blob/main/CREDITS.md">Credits</a></footer>
+</main></body></html>

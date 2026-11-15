@@ -1,0 +1,40 @@
+{
+  "_note": "Offense frame: x is yards to the offense's right of the ball, z is yards downfield from the line of scrimmage. Routes are offsets from where the player lines up. New plays need no code.",
+  "formation": {
+    "LT": [-4, -1], "LG": [-2, -1], "C": [0, -0.8], "RG": [2, -1], "RT": [4, -1],
+    "QB": [0, -5], "RB": [2.2, -6], "TE": [6, -1], "WR1": [-20, -1], "WR2": [20, -1], "WR3": [-12, -1.6]
+  },
+  "defense_formation": {
+    "DE1": [-5, 1.2], "DT1": [-1.6, 1.2], "DT2": [1.6, 1.2], "DE2": [5, 1.2],
+    "LB1": [-6, 5], "LB2": [0, 5], "LB3": [6, 5],
+    "CB1": [-20, 6], "CB2": [20, 6], "S1": [-5, 14], "S2": [7, 11]
+  },
+  "offense": [
+    {"id": "slants", "name": "Quick Slants", "type": "pass", "targets": ["WR1", "WR3", "TE", "WR2"],
+     "routes": {"WR1": {"pts": [[0, 3], [9, 10]]}, "WR2": {"pts": [[0, 3], [-9, 10]]}, "WR3": {"pts": [[0, 4], [7, 11]]}, "TE": {"pts": [[0, 5], [5, 5]], "stop": true}}},
+    {"id": "deep", "name": "Go Deep", "type": "pass", "targets": ["WR1", "WR3", "TE", "WR2"],
+     "routes": {"WR1": {"pts": [[0, 34]]}, "WR2": {"pts": [[0, 34]]}, "WR3": {"pts": [[0, 9], [5, 28]]}, "TE": {"pts": [[0, 10], [0, 16]], "stop": true}}},
+    {"id": "outs", "name": "Sideline Outs", "type": "pass", "targets": ["WR1", "WR3", "TE", "WR2"],
+     "routes": {"WR1": {"pts": [[0, 9], [-4.5, 9]], "stop": true}, "WR2": {"pts": [[0, 9], [4.5, 9]], "stop": true}, "WR3": {"pts": [[0, 11], [9, 15]]}, "TE": {"pts": [[0, 6], [7, 6]], "stop": true}}},
+    {"id": "cross", "name": "Crossers", "type": "pass", "targets": ["WR1", "WR3", "RB", "WR2"],
+     "routes": {"WR1": {"pts": [[0, 5], [24, 10]]}, "WR2": {"pts": [[0, 4], [-22, 6]]}, "WR3": {"pts": [[0, 13]], "stop": true}, "TE": {"pts": [[0, 20]]}, "RB": {"pts": [[6, 0], [10, 4]], "stop": true}}},
+    {"id": "dive", "name": "Inside Dive", "type": "run", "aim": [0.8, 1.5]},
+    {"id": "tackle", "name": "Off Tackle", "type": "run", "aim": [7.0, 1.0]},
+    {"id": "sweep_l", "name": "Sweep Left", "type": "run", "aim": [-13, 0.5]},
+    {"id": "sweep_r", "name": "Sweep Right", "type": "run", "aim": [13, 0.5]}
+  ],
+  "defense": [
+    {"id": "man", "name": "Man Cover", "tip": "Each defender follows one receiver",
+     "jobs": {"DE1": "rush", "DT1": "rush", "DT2": "rush", "DE2": "rush", "CB1": "man:WR1", "CB2": "man:WR2", "LB1": "man:WR3", "LB3": "man:TE", "LB2": "man:RB", "S1": "zone:0,17", "S2": "zone:8,13"},
+     "align": {"LB1": [-12, 4.5]}},
+    {"id": "zone", "name": "Zone Cover", "tip": "Defenders guard areas of the field",
+     "jobs": {"DE1": "rush", "DT1": "rush", "DT2": "rush", "DE2": "rush", "CB1": "zone:-19,11", "CB2": "zone:19,11", "LB1": "zone:-10,6", "LB2": "zone:0,7", "LB3": "zone:10,6", "S1": "zone:-7,16", "S2": "zone:7,16"},
+     "align": {}},
+    {"id": "blitz", "name": "Blitz", "tip": "Six rushers chase the quarterback",
+     "jobs": {"DE1": "rush", "DT1": "rush", "DT2": "rush", "DE2": "rush", "LB1": "rush", "LB3": "rush", "LB2": "man:RB", "CB1": "man:WR1", "CB2": "man:WR2", "S2": "man:WR3", "S1": "man:TE"},
+     "align": {"LB1": [-3.5, 2.5], "LB3": [3.5, 2.5], "S2": [-12, 6], "S1": [6, 8]}},
+    {"id": "stuff", "name": "Run Stuff", "tip": "Crowd the line to stop the run",
+     "jobs": {"DE1": "rush", "DT1": "rush", "DT2": "rush", "DE2": "rush", "LB1": "rush", "LB2": "rush", "LB3": "rush", "S2": "rush", "CB1": "man:WR1", "CB2": "man:WR2", "S1": "zone:0,9"},
+     "align": {"LB1": [-7.5, 2.2], "LB2": [0, 3], "LB3": [7.5, 2.2], "S2": [9.5, 4], "S1": [0, 9]}}
+  ]
+}
