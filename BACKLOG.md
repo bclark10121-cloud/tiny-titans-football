@@ -26,7 +26,7 @@ Updated 2026-11-15. Brian decides the order.
 2. Better character design (2026-11-15). Players that look more like football players: helmet, pads, jersey and number. Goes with item 1. v0.2.0 adds jersey numbers and bigger linemen.
 3. 7 on 7 option (2026-11-15). A quicker game mode with 7 players a side. It was idea 9.
 4. Option plays (2026-11-15). Built in the v0.2.0 work, not released yet: Speed Option Right and Left, Pistol Option, Zone Read and Zone Read Left, with a pitch button.
-5. Button to run faster (2026-11-15). Sprint works today: hold Space or Shift on a keyboard, A or RT on a controller, or the A button on touch. Brian to confirm what he wants changed: a clearer touch button, a stronger burst or a stamina meter.
+5. Burst button (2026-11-15). A touch button that gives a burst of speed for 2 seconds. Today sprint is a hold: Space or Shift on a keyboard, A or RT on a controller, the A button on touch. Assumptions to confirm: the burst can be used again after 5 seconds, hold-to-sprint stays, and keyboard and controller get the burst on a key and a button too.
 
 ## Ideas to choose from (Brian picks by number)
 
