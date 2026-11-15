@@ -2,28 +2,29 @@
 # Browser check for Tiny Titans Football. The game reports its state to the page (?test), so the test
 # reacts to each state instead of guessing times. It plays part of a game: kickoff or return, play call tabs,
 # hot route, audible, a lob and a bullet pass, a run, an option pitch, auto pass, defense, kicks and the menu. Then it checks touch
-# controls and a pretend notch (?notch=80). It prints errors [] and the largest draw call, triangle and
+# controls and a pretend notch (?test&notch). It prints errors [] and the largest draw call, triangle and
 # video memory numbers seen while the ball was live.
+# Server, browser, screenshots and touch come from the shared kit: tests/common/webkit.py (G10).
+# Test switches work only with the whole-word ?test flag (G7.8).
 # usage: web_test.py [web build folder] [shots folder]
-import asyncio, sys, subprocess, time, os, json
-from playwright.async_api import async_playwright
+import asyncio, sys, time, os, json
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "common"))
+from webkit import Run, serve
 OUT = sys.argv[1] if len(sys.argv) > 1 else "/home/claude/ttf-out/web"
 SHOTS = sys.argv[2] if len(sys.argv) > 2 else "/home/claude/ttf-out/shots"
 os.makedirs(SHOTS, exist_ok=True)
-errs = []; notes = []; seen = set(); perf = {"dc": 0, "tris": 0, "vram": 0, "fps_min": 999}
+seen = set(); perf = {"dc": 0, "tris": 0, "vram": 0, "fps_min": 999}
 TITLE, TEAMSEL, PLAYCALL, PRESNAP, LIVE, DEAD, KICK, OVER = range(8)
 
 async def main():
-    srv = subprocess.Popen([sys.executable, "-m", "http.server", "8792", "--bind", "127.0.0.1"], cwd=OUT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL); time.sleep(1)
-    try:
-        async with async_playwright() as p:
-            b = await p.chromium.launch(executable_path="/usr/bin/google-chrome", args=["--no-sandbox", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"])
-            ctx = await b.new_context(viewport={"width": 1280, "height": 720}, has_touch=True)
-            pg = await ctx.new_page()
-            pg.on("pageerror", lambda e: errs.append("page: " + str(e)))
-            pg.on("console", lambda m: errs.append("console: " + m.text) if m.type == "error" else None)
-            await pg.goto("http://127.0.0.1:8792/index.html?test")
-            async def st(): return await pg.evaluate("window.ttf || null")
+    with serve(OUT, 8792) as base:
+        async with Run("ttf", SHOTS) as r:
+            pg = r.page; ctx = r.ctx; errs = r.errs; notes = r.notes
+            await r.open(base + "index.html?test")
+            async def st():
+                s = await r.state()
+                if s and "phase" in s: s["state"] = s["phase"]  # the kit bridge publishes the game state as phase
+                return s
             async def wait_state(states, secs=40):
                 t = time.time()
                 while time.time() - t < secs:
@@ -35,7 +36,7 @@ async def main():
                 errs.append("timeout waiting for %s, got %s" % (states, await st())); return await st()
             async def shot(n):
                 if n in seen: return
-                seen.add(n); await pg.screenshot(path=SHOTS + "/" + n + ".png")
+                seen.add(n); await r.shot(n)
             async def key(k, wait=350): await pg.keyboard.press(k); await pg.wait_for_timeout(wait)
             await wait_state([TITLE], 60); await pg.wait_for_timeout(1200); await shot("01_title")
             await key("Enter"); await wait_state([TEAMSEL]); await pg.wait_for_timeout(600); await shot("02_teams")
@@ -143,19 +144,16 @@ async def main():
             # pretend notch: HUD must move clear of an 80 px inset on the left
             pg2 = await ctx.new_page()
             pg2.on("pageerror", lambda e: errs.append("page2: " + str(e)))
-            await pg2.goto("http://127.0.0.1:8792/index.html?test&notch=80")
+            await pg2.goto(base + "index.html?test&notch")
             for _ in range(300):
                 s2 = await pg2.evaluate("window.ttf || null")
-                if s2 and s2["state"] == TITLE: break
+                if s2 and s2["phase"] == TITLE: break
                 await pg2.wait_for_timeout(150)
             await pg2.keyboard.press("Enter"); await pg2.wait_for_timeout(800); await pg2.keyboard.press("Enter")
             for _ in range(200):
                 s2 = await pg2.evaluate("window.ttf || null")
-                if s2 and s2["state"] in (PRESNAP, PLAYCALL): break
+                if s2 and s2["phase"] in (PRESNAP, PLAYCALL): break
                 await pg2.wait_for_timeout(150)
             await pg2.wait_for_timeout(1500); await pg2.screenshot(path=SHOTS + "/17_notch80.png")
-            await b.close()
-    finally:
-        srv.kill()
-    print("shots", sorted(seen)); print("notes", notes); print("perf", perf); print("errors", errs)
+    print("shots", sorted(seen)); print("perf", perf); print(r.report())
 asyncio.run(main())

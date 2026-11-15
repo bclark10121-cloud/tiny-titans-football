@@ -285,6 +285,14 @@ func _input(e: InputEvent) -> void:
 		_unlock_audio()
 	if e.is_echo():
 		return
+	if e is InputEventJoypadButton and e.is_action_pressed("ui_cancel") and hud:
+		# Xbox B goes back (G5.8): closes How to play, then the Menu
+		if hud.help_panel.visible:
+			_on_menu("help_close")
+			return
+		if hud.menu_open:
+			_on_menu("toggle")
+			return
 	for a: String in JUST_ACTIONS:
 		if e.is_action_pressed(a):
 			just[a] = true
