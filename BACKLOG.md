@@ -29,7 +29,7 @@ Updated 2026-11-15. Brian decides the order.
 
 1. Player models from Patch.gg. v0.1.0 uses players built in code. Patch.gg has no American football player model.
 2. Better character design (2026-11-15). Players that look more like football players: helmet, pads, jersey and number. Goes with item 1. v0.2.0 adds jersey numbers and bigger linemen.
-3. 7 on 7 option (2026-11-15). Planned for v0.2.0 as the default game, with 11 on 11 still a choice. It was idea 9. Offense (Brian, 2026-11-15): 3 linemen, 1 QB, 1 RB and 2 WR. That gives 3 pass targets instead of 4. Full 100-yard field (Brian, 2026-11-15). Assumed defense to confirm: 3 linemen, 2 linebackers and 2 defensive backs.
+3. 7 on 7 option (2026-11-15). Planned for v0.2.0 as the default game, with 11 on 11 still a choice. It was idea 9. Offense (Brian, 2026-11-15): 3 linemen, 1 QB, 1 RB and 2 WR. That gives 3 pass targets instead of 4. Full 100-yard field (Brian, 2026-11-15). Defense: 3 linemen, 2 linebackers and 2 defensive backs (Brian, 2026-11-15).
 4. Option plays (2026-11-15). Built in the v0.2.0 work, ships in v0.2.0: Speed Option Right and Left, Pistol Option, Zone Read and Zone Read Left, with a pitch button.
 5. Burst button (2026-11-15). Planned for v0.3.0. A touch button that gives a burst of speed for 2 seconds. Today sprint is a hold: Space or Shift on a keyboard, A or RT on a controller, the A button on touch. Assumptions to confirm: the burst can be used again after 5 seconds, hold-to-sprint stays, and keyboard and controller get the burst on a key and a button too.
 
@@ -76,7 +76,7 @@ Updated 2026-11-15. Brian decides the order.
 - 2026-11-14: v0.2 scope picked: kicking game and returns, feel and polish, bigger playbook, season mode.
 - 2026-11-14: One source. The standards live only in the private repo `game-standards`. The shared kit is pulled into this repo with `sync_common.sh`. The signing key lives in the private repo `game-signing`.
 - 2026-11-15: 7 on 7 is the default game in v0.2.0 and 11 on 11 stays a choice. Option plays ship in v0.2.0. The 2 second burst button comes in v0.3.0.
-- 2026-11-15: 7 on 7 offense: 3 linemen, 1 QB, 1 RB and 2 WR. Full field.
+- 2026-11-15: 7 on 7 offense: 3 linemen, 1 QB, 1 RB and 2 WR. Defense: 3 linemen, 2 linebackers and 2 defensive backs. Full field.
 
 ## Judgment calls made in v0.1.0 (Brian to confirm or change)
 
