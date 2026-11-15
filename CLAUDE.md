@@ -8,7 +8,7 @@ Tiny Titans Football is Brian Clark's arcade football game. Godot 4.6, Android a
 - Overrides, open items and the standards version this game was checked against live in `STANDARDS_OVERRIDES.md`. Order of authority: Brian in the chat, then `STANDARDS_OVERRIDES.md`, then the standards.
 - Never edit a standards file. Propose a change to Brian. It changes in `game-standards` first. A football-only exception goes in `STANDARDS_OVERRIDES.md` as Proposed until Brian approves it.
 - The shared kit is pulled into `addons/bc_common/`, `tools/common/` and `tests/common/` with `bash ../game-standards/common/sync_common.sh ../game-standards .`. `common.lock` records the version and commit. Never edit those files here. Propose changes to Brian for `game-standards/common`.
-- Signing: the key `wandervalley.jks` and its settings live in the private repo `bclark10121-cloud/game-signing` (G1.7). Clone it outside this repo (for example `../game-signing`). Build the APK with `tools/common/sign_android.sh`. The signature must start with `5db69ffb`. Never commit a key, a password or `signing.properties`.
+- Signing: the key `wandervalley.jks` and its settings live in the private repo `bclark10121-cloud/game-signing` (G1.7). Clone it outside this repo (for example `../game-signing`). Build the APK with `tools/common/sign_android.sh`. The signature must start with `5db69ffb`. Never commit a key, a password or `signing.properties`, and never write a password in a build file, a doc or a reply (G1.9). Re-clone `game-signing` when Brian says its settings changed.
 - Do not change other game repos or `game-standards` unless Brian asks.
 
 ## Pillars (never break these)
@@ -28,14 +28,16 @@ Note: this game has an opponent and a final score. `STANDARDS_OVERRIDES.md` reco
 - Players move with plain maths, not physics bodies. `main.gd` sets `want` and `player.gd` eases toward it.
 - Field lines and numbers are painted into one field texture. Never lay a thin layer on the grass: it flickers on phones.
 - Save file is `user://tiny_titans.json`, format `v: 1`. Only add fields, each with a safe default. From the next release it is written with `addons/bc_common/save_store.gd`.
-- The `?test` state moves to `addons/bc_common/test_bridge.gd` on the next release.
+- Test hooks stay off for players (G7.8). The browser build publishes `window.ttf` only with the whole-word `?test` flag, through `addons/bc_common/test_bridge.gd`. Every other browser switch (`bot`, `fast`) is read with `TestBridge.has_flag` and only together with `?test`. The Android build reads no switches. Command line switches (`--bot`, `--fast`, `--games=`, `--seed=`) are for desktop and headless runs. A test hook never writes a save outside test mode.
 - Every outside asset goes in `CREDITS.md` with its licence. Music comes from the Patch.gg library (`tools/common/patch_assets.py`).
 
 ## Test gate
 
 - `bash tools/common/sync_common.sh --check .` must print `COMMON check ok`.
+- `bash tools/common/check_secrets.sh` must print `SECRETS check ok` (G1.9).
 - `godot --headless --path . -- --bot --games=6` must finish every game and print `BOT done`. Typical final scores sit between 0 and 40 a side.
-- `python3 tests/web_test.py <web build folder> <shots folder>` must print `errors []`. View the screenshots.
+- `python3 tests/web_test.py <web build folder> <shots folder>` must print `errors []`. It opens `index.html?test`. View the screenshots.
+- Test hooks run only with the whole-word `?test` flag and never in the APK (G7.8). Without `?test` the page has no `window.ttf` and `?bot` or `?fast` do nothing.
 - `python3 tests/common/page_check.py https://bclark10121-cloud.github.io/tiny-titans-football/` after every push must print `errors []`.
 
 ## Deliver every time (every release)

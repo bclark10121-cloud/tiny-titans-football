@@ -9,7 +9,7 @@ OUT="$1"; [ -n "$OUT" ] || { echo "usage: sign_android.sh <apk out path>"; exit 
 SIGN="${GAME_SIGNING:-../game-signing}"; GODOT="${GODOT:-godot}"; APKSIGNER="${APKSIGNER:-apksigner}"
 [ -f "$SIGN/signing.properties" ] || { echo "game-signing not found at $SIGN. Clone bclark10121-cloud/game-signing outside the game repo"; exit 1; }
 prop() { grep "^$1=" "$SIGN/signing.properties" | cut -d= -f2-; }
-case "$(cd "$SIGN" && pwd)" in "$(pwd)"*) echo "game-signing must sit outside the game repo"; exit 1;; esac
+case "$(cd "$SIGN" && pwd)" in "$(pwd)"|"$(pwd)"/*) echo "game-signing must sit outside the game repo"; exit 1;; esac
 export GODOT_ANDROID_KEYSTORE_RELEASE_PATH="$(cd "$SIGN" && pwd)/$(prop keystore)"
 export GODOT_ANDROID_KEYSTORE_RELEASE_USER="$(prop alias)"
 export GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD="$(prop store_password)"

@@ -6,3 +6,8 @@
 !docs/downloads/*.apk
 __pycache__/
 *.pyc
+# never commit secrets (G1.9). The key and its settings live in the private repo game-signing
+signing.properties
+game-signing/
+# Godot makes these for the kit scripts. sync_common.sh removes them, so they stay out of git
+addons/bc_common/*.uid

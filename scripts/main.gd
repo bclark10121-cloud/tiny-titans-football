@@ -71,6 +71,8 @@ var save := {"v": 1, "sound": true, "wins": 0, "losses": 0, "ties": 0, "team": 0
 var fast := false
 var verbose := false
 var test_hook := false
+const TestBridge := preload("res://addons/bc_common/test_bridge.gd")
+var bridge: TestBridge  # kit test bridge: on only for the whole-word ?test flag in a browser build (G7.8)
 
 func dirv(side: int) -> float:
 	return 1.0 if side == 0 else -1.0
@@ -94,18 +96,22 @@ func _ready() -> void:
 	randomize()
 	teams = _load_json("res://data/teams.json")
 	plays = _load_json("res://data/plays.json")
-	var args := OS.get_cmdline_user_args() + OS.get_cmdline_args()
-	if OS.has_feature("web"):
-		var q = JavaScriptBridge.eval("window.location.search", true)
-		if q is String:
-			for a in q.trim_prefix("?").split("&"): args.append("--" + a)
+	# Test switches (G7.8). Command line switches work on desktop and headless runs.
+	# The Android build takes none. A browser build reads switches only with the whole-word ?test flag.
+	var args: PackedStringArray = PackedStringArray()
+	if not OS.has_feature("android") and not OS.has_feature("web"):
+		args = OS.get_cmdline_user_args() + OS.get_cmdline_args()
 	for a in args:
 		if a == "--bot": bot = true
 		elif a == "--fast": fast = true
 		elif a == "--verbose": verbose = true
-		elif a == "--test": test_hook = OS.has_feature("web")
 		elif a.begins_with("--games="): bot_games = int(a.get_slice("=", 1))
 		elif a.begins_with("--seed="): seed(int(a.get_slice("=", 1)))
+	bridge = TestBridge.new("ttf")
+	test_hook = bridge.enabled
+	if test_hook:
+		bot = TestBridge.has_flag("bot")
+		fast = TestBridge.has_flag("fast")
 	_load_save()
 	_build_world()
 	_build_audio()
@@ -592,7 +598,12 @@ func _process(dt: float) -> void:
 		var n := clampi(int(ceil(dt / 0.04)), 1, 3)
 		for i in n: tick(dt / n)
 	if test_hook:
-		JavaScriptBridge.eval("window.ttf={state:%d,poss:%d,down:%d,q:%d,clock:%d,s0:%d,s1:%d,ball:'%s',ctrl:'%s'}" % [state, poss, down_n, quarter, int(clock), score[0], score[1], ball_state, (ctrl.role if ctrl else "")], true)
+		# published through the kit bridge, only with ?test (G7.8). This game takes no test commands yet.
+		bridge.tick(dt, _test_state, 0.0)
+
+func _test_state() -> Dictionary:
+	return {"state": state, "poss": poss, "down": down_n, "q": quarter, "clock": int(clock), "s0": score[0], "s1": score[1],
+		"ball": ball_state, "ctrl": (ctrl.role if ctrl else "")}
 
 func tick(dt: float) -> void:
 	if just.get("menu", false) and not bot:
