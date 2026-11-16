@@ -1,6 +1,6 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-16 for v0.3.4. BC decides the order.
+Updated 2026-11-16 for v0.3.5. BC decides the order.
 
 ## Done
 
@@ -78,6 +78,7 @@ Updated 2026-11-16 for v0.3.4. BC decides the order.
 - 4 fictional teams. Practice mode. Keyboard, controller and touch controls.
 - Win, loss and tie record saved on the device.
 - v0.3.4 (2026-11-16), sound fix (BC 2026-11-16: no music in the browser). The Music and Sfx buses come from `default_bus_layout.tres` instead of `AudioServer.add_bus()` at runtime, which left every sound silent in the browser build. New `tests/audio_test.py` measures the page's real sound output. Version code 7.
+- v0.3.5 (2026-11-16), sound effects in the browser. Found while fixing Tiny Tailwind's silent laser (BC said "yes" to the fix). Every sound effect had been silent in the browser: the Sfx bus in `default_bus_layout.tres` named no send, and with `default_playback_type.web=1` (sample playback) the browser plays such a bus nowhere. Music has a send, so it played. The Sfx bus now sends to Master. `tests/audio_test.py` now also checks that every bus names a send. A recording of the page with the music cut: one faint blip on v0.3.4, clear whistle and clicks on v0.3.5. Android was not affected. Version code 8.
 
 ## Now
 
@@ -135,6 +136,7 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 ## Decisions from BC
 
+- 2026-11-16: "yes" to fixing the silent sound effects found in Tiny Tailwind wherever the same route was missing. Shipped here as v0.3.5.
 - 2026-11-14: Focus on on-field play. Godot for Android and browser. Angled camera with low-poly 3D.
 - 2026-11-14: 11 on 11. Arcade feel. Use Patch.gg.
 - 2026-11-14: Name is Tiny Titans Football. BC kept the name after seeing the overlap notes (DC Comics "Tiny Titans", Tennessee Titans).
@@ -154,6 +156,13 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 - 2026-11-15: Claude picks the quality of life items for v0.3.0 (BC: "use your best judgement").
 - 2026-11-15: v0.3.0 holds the burst button, season mode and the quality of life items together (BC: "move forward with the next release").
 - 2026-11-15: LT is the burst and RT stays hold-to-sprint. BC asked for RT, then kept LT.
+
+## Judgment calls made in v0.3.5 (BC to confirm or change)
+
+1. A patch number (v0.3.5) for the sound route fix only. Nothing else rides along.
+2. Shipped with the Tiny Tailwind fix (BC's "yes" there), since it is the same bug. BC named Lo-Fi League and The Scenic Route, but those two turned out fine: they use the default stream playback, where a bus with no send still reaches the speakers. This game uses sample playback, like Tiny Tailwind.
+3. Sample playback (`default_playback_type.web=1`) stays. Changing the playback mode is a bigger change for BC to decide.
+4. The Game Shelf picture stays as it is: nothing on screen changed.
 
 ## Judgment calls made in v0.3.4 (BC to confirm or change)
 
