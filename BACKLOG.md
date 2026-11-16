@@ -1,6 +1,6 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-15 for v0.3.3. Brian decides the order.
+Updated 2026-11-15 for v0.3.3. BC decides the order.
 
 ## Done
 
@@ -16,16 +16,16 @@ Updated 2026-11-15 for v0.3.3. Brian decides the order.
 
 ### v0.3.2 (standards release: Settings and save slots)
 
-- One Settings menu, the same in every game from now on (asked for by Brian, G5.11). Music and Sound in five levels. Full screen in the browser. Frame rate number. Rumble. Then Auto pass, Players, Quarter length and Controls. Then Text size and Reset settings. Every change saves by itself. No Save button.
-- Five save slots (asked for by Brian, G5.12). A Slot button on the title card opens the list. Each slot has its own record, season and saved game. Delete on every used slot, with a second press. Your save from v0.3.1 is now slot 1.
+- One Settings menu, the same in every game from now on (asked for by BC, G5.11). Music and Sound in five levels. Full screen in the browser. Frame rate number. Rumble. Then Auto pass, Players, Quarter length and Controls. Then Text size and Reset settings. Every change saves by itself. No Save button.
+- Five save slots (asked for by BC, G5.12). A Slot button on the title card opens the list. Each slot has its own record, season and saved game. Delete on every used slot, with a second press. Your save from v0.3.1 is now slot 1.
 - Settings are kept apart from the slots, so deleting a slot never changes them.
 - Shared kit 1.7.0. This game is the pilot for it.
 
 ### v0.3.1 (standards release, no new football)
 
-- Debug menu (asked for by Brian, G5.9). Settings shows Tester tools in test builds. A code opens it. Tools: Home score +7, Away score +7, Quarter, Clock to 10 seconds, Final play, New season at week 1, Jump to week 4, Jump to week 6, Jump to the Title Game, Difficulty, Pretend camera notch, Reset the save, Load the test save, a frame rate and memory readout and game speed x1, x2 and x4. A red DEBUG tag shows while it is unlocked. Works with touch, a keyboard or only an Xbox controller.
-- Own app icon set (asked for by Brian, G6.10). One 1024 master. Android launcher icon and adaptive icon set for the first time.
-- Source moved to the private repo (Brian, G1.7). The public repo now holds only the game page, builds, release notes and this backlog.
+- Debug menu (asked for by BC, G5.9). Settings shows Tester tools in test builds. A code opens it. Tools: Home score +7, Away score +7, Quarter, Clock to 10 seconds, Final play, New season at week 1, Jump to week 4, Jump to week 6, Jump to the Title Game, Difficulty, Pretend camera notch, Reset the save, Load the test save, a frame rate and memory readout and game speed x1, x2 and x4. A red DEBUG tag shows while it is unlocked. Works with touch, a keyboard or only an Xbox controller.
+- Own app icon set (asked for by BC, G6.10). One 1024 master. Android launcher icon and adaptive icon set for the first time.
+- Source moved to the private repo (BC, G1.7). The public repo now holds only the game page, builds, release notes and this backlog.
 - Game page line reads `Version 0.3.1. Release notes · Backlog` (G1.8).
 - Test gate: test what changed (G7.9). The 12 bot games and the bot season no longer run on every release.
 - Shared kit 1.6.0. This game is the pilot for it.
@@ -33,8 +33,8 @@ Updated 2026-11-15 for v0.3.3. Brian decides the order.
 
 ### v0.3.0
 
-- Season mode (asked for by Brian). 6 weeks against the other 3 teams, twice each. The other game each week is simulated from team ratings. Standings with W, L, T, points for and points against. The top 2 meet in the Title Game, which goes to more overtime until someone scores. Saved on the device. End season takes two presses.
-- Burst button (asked for by Brian). 2 seconds at 1.3 times top speed, ready again 5 seconds after it ends. F, LT or the Burst button with a gold charge ring. Hold-to-sprint stays on Shift, RT and the Sprint button. A runner on a burst is a little harder to tackle.
+- Season mode (asked for by BC). 6 weeks against the other 3 teams, twice each. The other game each week is simulated from team ratings. Standings with W, L, T, points for and points against. The top 2 meet in the Title Game, which goes to more overtime until someone scores. Saved on the device. End season takes two presses.
+- Burst button (asked for by BC). 2 seconds at 1.3 times top speed, ready again 5 seconds after it ends. F, LT or the Burst button with a gold charge ring. Hold-to-sprint stays on Shift, RT and the Sprint button. A runner on a burst is a little harder to tackle.
 - Continue a game. Saved at every play call, kickoff and try. The title card shows the score of the game in progress.
 - Pause when the game loses focus. The Menu opens and the clock stops.
 - Skip the wait after a play with A, Space or a tap.
@@ -48,16 +48,16 @@ Updated 2026-11-15 for v0.3.3. Brian decides the order.
 
 ### v0.2.0
 
-- 7 on 7 is the default game (asked for by Brian). Offense: 3 linemen, a QB, a running back and 2 receivers. Defense: 3 linemen, 2 linebackers and 2 defensive backs. Full 100-yard field. Kickoffs and punts are 7 a side too.
+- 7 on 7 is the default game (asked for by BC). Offense: 3 linemen, a QB, a running back and 2 receivers. Defense: 3 linemen, 2 linebackers and 2 defensive backs. Full 100-yard field. Kickoffs and punts are 7 a side too.
 - 11 on 11 stays a choice. Players on the team screen. Saved on the device.
 - Full Xbox controller support (G5.8). Every screen works with only a controller. A chooses, B goes back, View or Menu opens the Menu. The game page has a section on pairing an Xbox controller.
 - Kickoffs and punts you play, with a kicker, a timing meter and returns. Touchbacks, muffed punts and safeties with a free kick.
 - Interceptions and fumbles are live. Run them back for a score.
 - Two-point tries after a touchdown. Sudden death overtime when tied after four quarters. Halftime kickoff.
 - Playbook: 33 offensive plays on four tabs (Short, Deep, Run, Option) and 20 defenses on four tabs (Man, Zone, Blitz, Run).
-- Option plays (asked for by Brian): Speed Option Right, Speed Option Left, Pistol Option, Zone Read and Zone Read Left. Pitch to the back with E, B or the Pitch button.
-- More running plays (asked for by Brian): Counter and Stretch Right join the Run tab.
-- Auto pass setting (asked for by Brian): the QB throws for you and you take the catcher. On the team screen and in the Menu. Saved on the device.
+- Option plays (asked for by BC): Speed Option Right, Speed Option Left, Pistol Option, Zone Read and Zone Read Left. Pitch to the back with E, B or the Pitch button.
+- More running plays (asked for by BC): Counter and Stretch Right join the Run tab.
+- Auto pass setting (asked for by BC): the QB throws for you and you take the catcher. On the team screen and in the Menu. Saved on the device.
 - Hot routes and audibles before the snap. Tap a receiver's button for a bullet, hold it for a lob.
 - Difficulty: Easy, Normal and Hard.
 - Jersey numbers, a holder and kicker on field goals, bigger linemen.
@@ -80,23 +80,23 @@ Updated 2026-11-15 for v0.3.3. Brian decides the order.
 
 ## Now
 
-- Brian plays v0.3.0 and reports how it feels. Test checklist: `docs/release-notes/v0.3.0.md`.
+- BC plays v0.3.0 and reports how it feels. Test checklist: `docs/release-notes/v0.3.0.md`.
 - v0.3.0 installs over v0.2.0. Anyone still on v0.1.0 uninstalls it once.
 
-## Next (v0.4.0, Brian picks)
+## Next (v0.4.0, BC picks)
 
-Brian's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 yet. The top candidates:
+BC's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 yet. The top candidates:
 
-1. Better character design (asked for by Brian). Helmets, pads, jerseys and numbers that read as football players.
+1. Better character design (asked for by BC). Helmets, pads, jerseys and numbers that read as football players.
 2. Penalties (idea 1).
 3. A 7 on 7 playbook (idea 13).
 
-## Asked for by Brian, not built yet
+## Asked for by BC, not built yet
 
 1. Player models from Patch.gg. Players are still built in code. Patch.gg has no American football player model.
 2. Better character design (2026-11-15). Players that look more like football players: helmet, pads, jersey and number. Goes with item 1. v0.2.0 added jersey numbers and bigger linemen.
 
-## Ideas to choose from (Brian picks by number)
+## Ideas to choose from (BC picks by number)
 
 1. Penalties: offside, holding and pass interference.
 2. Gameplay sliders (speed, tackle strength, pass accuracy).
@@ -124,16 +124,16 @@ Brian's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4
 - Real league, team or player names.
 - Anything copied from Maximum Football or another game.
 
-## Decisions from Brian
+## Decisions from BC
 
 - 2026-11-14: Focus on on-field play. Godot for Android and browser. Angled camera with low-poly 3D.
 - 2026-11-14: 11 on 11. Arcade feel. Use Patch.gg.
-- 2026-11-14: Name is Tiny Titans Football. Brian kept the name after seeing the overlap notes (DC Comics "Tiny Titans", Tennessee Titans).
+- 2026-11-14: Name is Tiny Titans Football. BC kept the name after seeing the overlap notes (DC Comics "Tiny Titans", Tennessee Titans).
 - 2026-11-14: Keep the test signing key for now. Ended in v0.2.0: it uses the real key.
 - 2026-11-14: Game standards and engineering standards are two separate files. Rule ids carry G and E prefixes. One `STANDARDS_OVERRIDES.md` per game. The master copy lives in the private repo `game-standards`.
 - 2026-11-14: Fix the engineering open items in `STANDARDS_OVERRIDES.md` as part of v0.2.
 - 2026-11-14: v0.2 scope picked: kicking game and returns, feel and polish, bigger playbook, season mode.
-- 2026-11-14: Apply only the standards that fit a sports game. Claude uses its judgment and Brian tests the result.
+- 2026-11-14: Apply only the standards that fit a sports game. Claude uses its judgment and BC tests the result.
 - 2026-11-14: Add more running plays with option runs and an auto pass setting.
 - 2026-11-14: One source. The standards live only in the private repo `game-standards`. The shared kit is pulled into this repo with `sync_common.sh`. The signing key lives in the private repo `game-signing`.
 - 2026-11-15: 7 on 7 is the default game in v0.2.0 and 11 on 11 stays a choice. Option plays ship in v0.2.0. The 2 second burst button comes in v0.3.0.
@@ -142,11 +142,11 @@ Brian's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4
 - 2026-11-15: Tag line is "Arcade 7 on 7 and 11 on 11 football".
 - 2026-11-15: Every release updates The Game Shelf card with every relevant change, in the same push.
 - 2026-11-15: Xbox controller support per G5.8, with Xbox button names and a pretend-controller browser test.
-- 2026-11-15: Claude picks the quality of life items for v0.3.0 (Brian: "use your best judgement").
-- 2026-11-15: v0.3.0 holds the burst button, season mode and the quality of life items together (Brian: "move forward with the next release").
-- 2026-11-15: LT is the burst and RT stays hold-to-sprint. Brian asked for RT, then kept LT.
+- 2026-11-15: Claude picks the quality of life items for v0.3.0 (BC: "use your best judgement").
+- 2026-11-15: v0.3.0 holds the burst button, season mode and the quality of life items together (BC: "move forward with the next release").
+- 2026-11-15: LT is the burst and RT stays hold-to-sprint. BC asked for RT, then kept LT.
 
-## Judgment calls made in v0.3.0 (Brian to confirm or change)
+## Judgment calls made in v0.3.0 (BC to confirm or change)
 
 1. Everything planned shipped in one release: the burst, season mode and the 7 quality of life items.
 2. A season is 6 weeks: each rival twice. The top 2 by win share, then point difference, then points scored, play the Title Game. If you miss it, the Title Game is simulated.
@@ -166,7 +166,7 @@ Brian's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4
 16. The title field now shows the 7 on 7 or 11 on 11 choice.
 17. The season screenshot on the game page shows a season after 2 weeks. Every score in it came from the game's own season simulation.
 
-## Judgment calls made in v0.2.0 (Brian to confirm or change)
+## Judgment calls made in v0.2.0 (BC to confirm or change)
 
 1. Season mode moved to v0.3.0. v0.2.0 was already large, so it ships now for testing.
 2. Option plays have their own Option tab. The Run tab gained Counter and Stretch Right.
@@ -176,7 +176,7 @@ Brian's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4
 6. Tap a receiver for a bullet, hold for a lob. The old idea list had it the other way round.
 7. When your team kicks, the camera sits higher and farther back so the kicker and the whole line show.
 8. The Menu labels got shorter (Help, Restart, Title) so all options fit in one row.
-9. Standards rows decided under Brian's instruction are marked Delegated in `STANDARDS_OVERRIDES.md`. Row 9 (E3.4): no per-prop cull distances, because the whole stadium is always in view.
+9. Standards rows decided under BC's instruction are marked Delegated in `STANDARDS_OVERRIDES.md`. Row 9 (E3.4): no per-prop cull distances, because the whole stadium is always in view.
 10. Test switches added: `--demo` (the computer plays both sides with full drawing), `--start=punt` or `--start=fg` (opens on fourth down) and `--mode=7` or `--mode=11`. Not shown in the game.
 11. 7 on 7 uses the same playbook. Routes for the tight end and the third receiver drop off. Pass plays go to the 2 receivers and the running back, so there are 3 targets. If a play has no route for the back, he runs a swing route.
 12. In 7 on 7, a defender assigned man coverage on a receiver who is not on the field plays a short zone instead.
