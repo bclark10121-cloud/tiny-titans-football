@@ -114,6 +114,14 @@ BC's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 
 14. Open receiver colours. Each receiver's button label turns green when open and red when covered. A help for new players.
 15. Box score at the end of the game: passing and rushing yards, completions and the longest play. Today the end screen shows total yards and turnovers.
 
+## Unfinished standards items (2026-11-15)
+
+From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on a real device. Each line comes off when it is done. BC picks when.
+
+- G5.14: two short hints still name more than one device: the audible list and the choice after a touchdown.
+- G5.18: time from opening the page to the first picture, measured on a phone.
+- Real device check: a phone, the Retroid, an Xbox controller and sound. Nothing has been tried on a real device yet (G7.10 is not in use, BC tries each build).
+
 ## Later
 
 - Google Play release.
