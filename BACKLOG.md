@@ -1,6 +1,6 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-15 for v0.3.3. BC decides the order.
+Updated 2026-11-16 for v0.3.4. BC decides the order.
 
 ## Done
 
@@ -77,6 +77,7 @@ Updated 2026-11-15 for v0.3.3. BC decides the order.
 - Field goals and extra points with a timing meter.
 - 4 fictional teams. Practice mode. Keyboard, controller and touch controls.
 - Win, loss and tie record saved on the device.
+- v0.3.4 (2026-11-16), sound fix (BC 2026-11-16: no music in the browser). The Music and Sfx buses come from `default_bus_layout.tres` instead of `AudioServer.add_bus()` at runtime, which left every sound silent in the browser build. New `tests/audio_test.py` measures the page's real sound output. Version code 7.
 
 ## Now
 
@@ -153,6 +154,13 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 - 2026-11-15: Claude picks the quality of life items for v0.3.0 (BC: "use your best judgement").
 - 2026-11-15: v0.3.0 holds the burst button, season mode and the quality of life items together (BC: "move forward with the next release").
 - 2026-11-15: LT is the burst and RT stays hold-to-sprint. BC asked for RT, then kept LT.
+
+## Judgment calls made in v0.3.4 (BC to confirm or change)
+
+1. A patch number (v0.3.4) for a sound fix only. No other change rides along.
+2. The engineering rule Home by Dusk proposed (E6.8: buses come from `default_bus_layout.tres`, never `AudioServer.add_bus()` at runtime, and every release measures real page sound) stays Proposed. Not in force until BC approves it.
+3. The sound test lives in this game's `tests/` for now, not in the shared kit. Moving it to the kit is a kit change for BC to approve.
+4. The sound test checks one moment: the first click and Enter on the title card. It does not walk every area.
 
 ## Judgment calls made in v0.3.0 (BC to confirm or change)
 
