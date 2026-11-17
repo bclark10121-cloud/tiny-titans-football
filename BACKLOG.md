@@ -97,6 +97,7 @@ BC's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 
 
 1. Player models from Patch.gg. Players are still built in code. Patch.gg has no American football player model.
 2. Better character design (2026-11-15). Players that look more like football players: helmet, pads, jersey and number. Goes with item 1. v0.2.0 added jersey numbers and bigger linemen.
+3. Suno music, second in line (BC, 2026-11-16, waits on G8.7). A title track to replace "Rock on Chicago" (CC BY, needs a credit), plus menu and halftime music. Replaces idea 11 (more music from Patch.gg).
 
 ## Ideas to choose from (BC picks by number)
 
@@ -219,3 +220,13 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 5. Ties stood with no overtime. Replaced in v0.2.0 by sudden death overtime.
 6. The player always attacks up the screen. Teams do not switch ends.
 7. The APK is signed with a test key. Replaced in v0.2.0 by the real key.
+
+## v0.4.0 (2026-11-17, Release 6)
+
+- Shipped: the shared start screen (G5.21, kit 1.10.0) with this game's own painted scene (`scripts/title_art.gd`). Continue only when there is something to continue, Play opens the slot list, Settings, Quit off the web. Long key lists, tips and credits left the start screen.
+
+### Judgment calls in v0.4.0 (BC to confirm)
+
+1. The controls line on the start screen is cut to the main keys and buttons. How to play keeps the full list.
+2. The Game Shelf card shows the new start screen in place of a play picture.
+3. Play, then a slot, leads to a new How do you want to play screen. Continue goes straight there for the slot in use. B goes back to the title card.
