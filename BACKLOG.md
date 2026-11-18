@@ -1,8 +1,17 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-17 for v0.5.2. BC decides the order.
+Updated 2026-11-17 for v0.6.0. BC decides the order.
 
 ## Done
+
+### v0.6.0 (2026-11-17: Back at the top, landscape and portrait)
+
+- Back at the top left of every full-screen panel (asked for by BC, G5.30): Settings, slot list, play mode, team, How to play, Records, Change controls. The header never scrolls.
+- Plays fully in portrait and landscape (asked for by BC, G6.18). Menus keep their size upright. Teams in one column, play cards three across, Menu row under the scoreboard, banners wrap. Portrait camera keeps the side-to-side view.
+- Turning the device mid-game keeps the game.
+- How to play text 18 instead of 15 (G5.26), scrolls when long.
+- `tests/orient_test.py`: five sizes, every panel, a turn mid-play. `tests/pad_test.py` walks the stacked start screen.
+- Pilot for kit 1.13.0.
 
 ### v0.5.2 (2026-11-17: Release 7, the standards review pieces, kit 1.12.0)
 
@@ -268,3 +277,14 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 1. The new track is set to the old track's loudness (about -17 LUFS). It came in much louder.
 2. The track plays whole as a 60-second loop. It is a loop by design, so it was not trimmed.
 3. It is CC0, so no credit is required. The credit stays in the game and on the page anyway.
+
+## v0.6.0 (2026-11-17, Back at the top and both orientations)
+
+### Judgment calls in v0.6.0 (BC to confirm)
+
+1. The season screen keeps its Play week, End season and Title buttons in one row at the bottom. Title is an action there, not a Back. It fits upright.
+2. The game over panel keeps Play again and Title. It is a result card, not a menu.
+3. Upright, the camera keeps a 62 degree side-to-side view and sits 35 percent higher. Players look smaller than in landscape. BC to judge on a phone.
+4. The APK turns with the phone but follows Android's rotation lock (fullUser).
+5. Version 0.6.0 on top of v0.5.2 from BC's other chat (Release 7).
+6. `tests/pad_test.py` failed on v0.5.2 too (it walked the old title card). Fixed in this release the same way v0.5.2 fixed `web_test.py`.
