@@ -1,8 +1,12 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-17 for v0.5.0. BC decides the order.
+Updated 2026-11-17 for v0.5.1. BC decides the order.
 
 ## Done
+
+### v0.5.1 (2026-11-17: new music)
+
+- New title music (asked for by BC, picked from three options): "Stage 3" by Juhani Junkala, CC0. Replaces "Rock on Chicago". Loudness matched to the old track.
 
 ### v0.5.0 (2026-11-17: new players, run cycle and celebrations)
 
@@ -106,7 +110,7 @@ BC's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 
 
 1. Player models from Patch.gg. Patch.gg has no American football player model. v0.5.0 built the players in code from BC's Gemini views instead (BC's pick, 2026-11-17).
 2. A Meshy 3D model of the Gemini player, rigged, as a later option. Heavier on phones than the code-built players.
-3. Suno music, second in line (BC, 2026-11-16, waits on G8.7). A title track to replace "Rock on Chicago" (CC BY, needs a credit), plus menu and halftime music. Replaces idea 11 (more music from Patch.gg).
+3. Suno music, second in line (BC, 2026-11-16, G8.7 now in force). Menu and halftime music, or a custom title track. v0.5.1 replaced "Rock on Chicago" with "Stage 3" from Patch.gg (BC's pick). Replaces idea 11 (more music from Patch.gg).
 
 ## Ideas to choose from (BC picks by number)
 
@@ -252,3 +256,11 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 6. The Game Shelf card picture is unchanged. BC picks from three new gameplay options first (rule from 2026-11-17).
 7. The game page's three pictures are new gameplay shots with the new players.
 8. `tests/web_test.py` stops at the start screen from v0.4.0 (it still looks for the old title card buttons). It fails the same way on the v0.4.0 build. New `tests/play_shots.py` took the gameplay pictures in the browser instead. Fixing `web_test.py` is an open item.
+
+## v0.5.1 (2026-11-17, new music)
+
+### Judgment calls in v0.5.1 (BC to confirm)
+
+1. The new track is set to the old track's loudness (about -17 LUFS). It came in much louder.
+2. The track plays whole as a 60-second loop. It is a loop by design, so it was not trimmed.
+3. It is CC0, so no credit is required. The credit stays in the game and on the page anyway.

@@ -4,9 +4,10 @@ Tiny Titans Football is made by BC. Teams, plays, players, stadium and interface
 
 ## Music (found through the Patch.gg asset library)
 
-- Title music: "Rock on Chicago" by Kevin MacLeod (incompetech.com). https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100093
-  Licensed Creative Commons Attribution 4.0 International. https://creativecommons.org/licenses/by/4.0/
-  Changes: re-encoded to Ogg Vorbis at 112 kbps. The embedded cover image was removed.
+- Music (since v0.5.1): "Stage 3" by Juhani Junkala, from "12 Music Loops" on OpenGameArt.org. https://opengameart.org/content/12-music-loops
+  Licensed CC0 1.0 Universal (public domain). https://creativecommons.org/publicdomain/zero/1.0/ No credit is required. We credit it anyway.
+  Changes: loudness matched to the old track (about -17 LUFS), resampled to 32 kHz and re-encoded to Ogg Vorbis at 96 kbps (E6.3).
+- Until v0.5.0: "Rock on Chicago" by Kevin MacLeod (incompetech.com), CC BY 4.0. No longer in the game.
 
 ## Sounds (found through the Patch.gg asset library)
 
