@@ -1,8 +1,10 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-17 for v0.6.0. BC decides the order.
+Updated 2026-11-18 for v0.6.1. BC decides the order.
 
 ## Done
+
+- v0.6.1 (2026-11-18): start screen music (G5.21, asked for by BC). The title track is its own "Rock on Chicago", now started at once off the web (`_unlock_audio()` from `_ready()`). On Android and desktop it starts with the start screen, in a browser on the first press. No two games share a title track.
 
 ### v0.6.0 (2026-11-17: Back at the top, landscape and portrait)
 
