@@ -1,8 +1,12 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-17 for v0.5.1. BC decides the order.
+Updated 2026-11-17 for v0.5.2. BC decides the order.
 
 ## Done
+
+### v0.5.2 (2026-11-17: Release 7, the standards review pieces, kit 1.12.0)
+
+- Records page with 10 achievements and 6 stats, Change controls with Sprint Hold or Toggle, Picture and Battery saver, backup codes, old-save checks, an error log and crowd sound at one loudness level.
 
 ### v0.5.1 (2026-11-17: new music)
 
