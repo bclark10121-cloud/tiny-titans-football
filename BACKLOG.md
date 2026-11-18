@@ -1,8 +1,17 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-16 for v0.3.5. BC decides the order.
+Updated 2026-11-17 for v0.5.0. BC decides the order.
 
 ## Done
+
+### v0.5.0 (2026-11-17: new players, run cycle and celebrations)
+
+- New player look (asked for by BC). Built in code to match BC's approved Gemini views (front, side and back in `art_src/reference/`): a big rounded helmet, a face mask cage, a face with eyes, huge rounded shoulder pads, bare arms, big mitten gloves, pants, sock bands and cleats. Low-poly faceted shapes like the reference.
+- Team colour zones from the approved art: jersey, pads and sock bands in the team jersey colour. Pants and socks in the team pants colour. The helmet in the team helmet colour. Charcoal face mask, gloves and cleats for every team. Numbers on the chest and back.
+- Better run cycle (asked for by BC): two-part legs with a knee fold, arms that pump with bent elbows, a forward lean that grows with the burst and a bob each stride. Blockers lean in with their arms out. The field goal holder kneels on one knee.
+- Touchdown celebrations (asked for by BC): jump, flex, spin and a high-knee dance. Each player has one, so the team mixes them up.
+- Still one shared mesh per body part: 16 draw calls for every player on the field.
+- Shared kit 1.11.0 (unchanged).
 
 ### v0.3.3 (standards release: the rules agreed on 2026-11-15)
 
@@ -85,18 +94,18 @@ Updated 2026-11-16 for v0.3.5. BC decides the order.
 - BC plays v0.3.0 and reports how it feels. Test checklist: `docs/release-notes/v0.3.0.md`.
 - v0.3.0 installs over v0.2.0. Anyone still on v0.1.0 uninstalls it once.
 
-## Next (v0.4.0, BC picks)
+## Next (v0.6.0, BC picks)
 
 BC's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 yet. The top candidates:
 
-1. Better character design (asked for by BC). Helmets, pads, jerseys and numbers that read as football players.
-2. Penalties (idea 1).
-3. A 7 on 7 playbook (idea 13).
+1. Penalties (idea 1).
+2. A 7 on 7 playbook (idea 13).
+3. Release 7 standards update for this game (PLAN.md): kit 1.12.0, achievements, stats, remapping and the rest.
 
 ## Asked for by BC, not built yet
 
-1. Player models from Patch.gg. Players are still built in code. Patch.gg has no American football player model.
-2. Better character design (2026-11-15). Players that look more like football players: helmet, pads, jersey and number. Goes with item 1. v0.2.0 added jersey numbers and bigger linemen.
+1. Player models from Patch.gg. Patch.gg has no American football player model. v0.5.0 built the players in code from BC's Gemini views instead (BC's pick, 2026-11-17).
+2. A Meshy 3D model of the Gemini player, rigged, as a later option. Heavier on phones than the code-built players.
 3. Suno music, second in line (BC, 2026-11-16, waits on G8.7). A title track to replace "Rock on Chicago" (CC BY, needs a credit), plus menu and halftime music. Replaces idea 11 (more music from Patch.gg).
 
 ## Ideas to choose from (BC picks by number)
@@ -228,5 +237,18 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 ### Judgment calls in v0.4.0 (BC to confirm)
 
 1. The controls line on the start screen is cut to the main keys and buttons. How to play keeps the full list.
-2. The Game Shelf card shows the new start screen in place of a play picture.
+2. The Game Shelf card shows gameplay (BC, 2026-11-17: picked from three options).
 3. Play, then a slot, leads to a new How do you want to play screen. Continue goes straight there for the slot in use. B goes back to the title card.
+
+## v0.5.0 (2026-11-17, new players)
+
+### Judgment calls in v0.5.0 (BC to confirm)
+
+1. Version 0.5.0, a feature release on kit 1.11.0. Release 7 (kit 1.12.0) is still to come for this game.
+2. Gloves, face mask and cleats stay charcoal for every team, as in the approved views. Team colour shows on the helmet, jersey, pads, sock bands and pants.
+3. No helmet stripe or logo. The approved views have a plain helmet. The old helmet stripe is gone.
+4. Shoulder pads are a little narrower than in the art (about 1.6 times the body width) so linemen 2 yards apart do not merge.
+5. Celebration style is set by the player's number in the line-up, not picked at random, so tests repeat.
+6. The Game Shelf card picture is unchanged. BC picks from three new gameplay options first (rule from 2026-11-17).
+7. The game page's three pictures are new gameplay shots with the new players.
+8. `tests/web_test.py` stops at the start screen from v0.4.0 (it still looks for the old title card buttons). It fails the same way on the v0.4.0 build. New `tests/play_shots.py` took the gameplay pictures in the browser instead. Fixing `web_test.py` is an open item.
