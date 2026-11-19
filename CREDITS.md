@@ -26,3 +26,4 @@ Tiny Titans Football is made by BC. Teams, plays, players, stadium and interface
 ## Tools
 
 - Godot Engine 4.6. https://godotengine.org (MIT licence)
+- Title font: Graduate, SIL Open Font License 1.1. Start screen, game page and Game Shelf card name (G5.21 Title, 2026-11-18). License text in `FONT-LICENSE-Graduate.txt`.

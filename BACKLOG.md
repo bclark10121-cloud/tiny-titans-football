@@ -4,6 +4,8 @@ Updated 2026-11-18 for v0.6.2. BC decides the order.
 
 ## Done
 
+- v0.6.3 (2026-11-18): start screen title (G5.21 Title, asked for by BC). The name sits in the dead center, above the buttons, in Graduate (SIL Open Font License 1.1), on the start screen, the game page and the Game Shelf card. Kit 1.15.0.
+
 - v0.6.2 (2026-11-18): match music (G5.21, asked for by BC). A match now plays "Funk Game Loop" under the crowd, different from the title track. The title track is "Stage 3" (the v0.6.1 note named the wrong song).
 - v0.6.1 (2026-11-18): start screen music (G5.21, asked for by BC). The title track is its own "Rock on Chicago", now started at once off the web (`_unlock_audio()` from `_ready()`). On Android and desktop it starts with the start screen, in a browser on the first press. No two games share a title track.
 
