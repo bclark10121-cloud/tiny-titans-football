@@ -4,6 +4,8 @@ Updated 2026-11-18 for v0.6.2. BC decides the order.
 
 ## Done
 
+- v0.6.4 (2026-11-19): Godot 4.7.2 (G6.19), no change to play. BC's Needs work on running, passing and tackling waits for his details.
+
 - v0.6.3 (2026-11-18): start screen title (G5.21 Title, asked for by BC). The name sits in the dead center, above the buttons, in Graduate (SIL Open Font License 1.1), on the start screen, the game page and the Game Shelf card. Kit 1.15.0.
 
 - v0.6.2 (2026-11-18): match music (G5.21, asked for by BC). A match now plays "Funk Game Loop" under the crowd, different from the title track. The title track is "Stage 3" (the v0.6.1 note named the wrong song).
@@ -113,8 +115,11 @@ Updated 2026-11-18 for v0.6.2. BC decides the order.
 
 ## Now
 
-- BC plays v0.3.0 and reports how it feels. Test checklist: `docs/release-notes/v0.3.0.md`.
-- v0.3.0 installs over v0.2.0. Anyone still on v0.1.0 uninstalls it once.
+- Playtest sweep results (BC, 2026-11-19, 8:59 PM):
+  - Good: code-built players and celebrations, Stage 3 music level, upright camera.
+  - Needs work (details asked): overall feel of running, passing and tackling.
+  - All judgment calls from v0.4.0 to v0.6.0 confirmed.
+- Then BC picks from Next below.
 
 ## Next (v0.6.0, BC picks)
 
@@ -256,7 +261,7 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 - Shipped: the shared start screen (G5.21, kit 1.10.0) with this game's own painted scene (`scripts/title_art.gd`). Continue only when there is something to continue, Play opens the slot list, Settings, Quit off the web. Long key lists, tips and credits left the start screen.
 
-### Judgment calls in v0.4.0 (BC to confirm)
+### Judgment calls in v0.4.0 (confirmed by BC 2026-11-19)
 
 1. The controls line on the start screen is cut to the main keys and buttons. How to play keeps the full list.
 2. The Game Shelf card shows gameplay (BC, 2026-11-17: picked from three options).
@@ -264,7 +269,7 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 ## v0.5.0 (2026-11-17, new players)
 
-### Judgment calls in v0.5.0 (BC to confirm)
+### Judgment calls in v0.5.0 (confirmed by BC 2026-11-19)
 
 1. Version 0.5.0, a feature release on kit 1.11.0. Release 7 (kit 1.12.0) is still to come for this game.
 2. Gloves, face mask and cleats stay charcoal for every team, as in the approved views. Team colour shows on the helmet, jersey, pads, sock bands and pants.
@@ -277,7 +282,7 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 ## v0.5.1 (2026-11-17, new music)
 
-### Judgment calls in v0.5.1 (BC to confirm)
+### Judgment calls in v0.5.1 (confirmed by BC 2026-11-19)
 
 1. The new track is set to the old track's loudness (about -17 LUFS). It came in much louder.
 2. The track plays whole as a 60-second loop. It is a loop by design, so it was not trimmed.
@@ -285,7 +290,7 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 ## v0.6.0 (2026-11-17, Back at the top and both orientations)
 
-### Judgment calls in v0.6.0 (BC to confirm)
+### Judgment calls in v0.6.0 (confirmed by BC 2026-11-19)
 
 1. The season screen keeps its Play week, End season and Title buttons in one row at the bottom. Title is an action there, not a Back. It fits upright.
 2. The game over panel keeps Play again and Title. It is a result card, not a menu.
