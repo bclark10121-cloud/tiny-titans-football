@@ -135,14 +135,14 @@ On the field:
 4. Quick game mode and Sim this week (idea 19).
 5. Limited audibles (idea 20).
 
-Between games, in a new Career mode:
+Between games, in a new Dynasty mode (working name Career until BC's pick on 2026-11-22):
 
 6. Star players with ratings and XP (idea 21).
 7. Credits, fans and morale (idea 22).
 8. Coach's call cards (idea 23).
 9. Facilities and coordinators (idea 24). Two buildings, no rehab centre (BC's pick).
 10. Off-season draft (idea 25).
-11. Career history: awards, a hall of fame and a champions list (idea 26).
+11. Dynasty history: awards, a hall of fame and a champions list (idea 26).
 12. Bigger league (idea 27).
 
 Also due at this release, from the standards:
@@ -156,10 +156,9 @@ Not in v0.7.0, still for BC to pick: penalties (idea 1) and the 7 on 7 playbook 
 
 Open before the build:
 
-- One decision page (G0.16): the 4 new teams, the aim arc, the star ring and the working names.
 - BC's details on the feel of running, passing and tackling (2026-11-19). Ideas 16 and 17 are the first answer to it.
 - Override row 11 in `STANDARDS_OVERRIDES.md` (G4.20) is Proposed until BC approves it.
-- Working names for BC to confirm: Career (the mode), Titan Tokens (the currency), Coach's call (the cards), Quick game (the mode).
+- Names picked (BC, 2026-11-22): Dynasty (the long mode), Titan Tokens, Coach's call and Quick game.
 
 ## Asked for by BC, not built yet
 
@@ -191,13 +190,13 @@ From the Retro Bowl review (2026-11-22). All 12 are in v0.7.0 (BC's pick). Sizes
 17. Swipe moves and a truck move (S to M). On touch, swipe up or down to juke and forward to dive. A new truck move lowers the shoulder through a tackler, on every device.
 18. Dynamic difficulty (S). A fourth choice beside Easy, Normal and Hard. Wins make the computer tougher. Losses ease it.
 19. Quick game mode (M). Offense only. The defense is simulated and shown as a one-line result. A full game in about 5 minutes. The season screen gets Sim this week.
-20. Limited audibles (S). The quarterback's rating sets how many audibles a half allows. Career mode only. Needs idea 21.
+20. Limited audibles (S). The quarterback's rating sets how many audibles a half allows. Dynasty mode only. Needs idea 21.
 21. Star players with ratings and XP (L). A few named, fictional stars per team who level up with play.
-22. Credits, fans and morale (M). One currency earned from wins (working name Titan Tokens). A bigger fan base pays more per win. Low morale means more fumbles.
+22. Credits, fans and morale (M). One currency earned from wins: Titan Tokens. A bigger fan base pays more per win. Low morale means more fumbles.
 23. Coach's call cards (S to M). One-tap choices between games, such as who to praise after a win. Shown in the talk box (G5.20).
 24. Facilities and coordinators (M). Two buildings to upgrade: a stadium for fans and a training centre for XP. Two coordinators with star ratings and traits. No rehab centre: this game has no injuries (calm level, G4.1).
 25. Off-season draft (L). Three rounds. Scouting shows a rookie's potential.
-26. Career history (M). Many seasons in one career. Player awards each season, a hall of fame the player picks and a champions list. Personal records only (G4.4).
+26. Dynasty history (M). Many seasons in one dynasty. Player awards each season, a hall of fame the player picks and a champions list. Personal records only (G4.4).
 27. Bigger league (M). More teams, a longer season and a playoff bracket. Today: 4 teams, 6 weeks and a 2-team Title Game.
 
 ## Unfinished standards items (2026-11-15)
@@ -220,6 +219,7 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 ## Decisions from BC
 
+- 2026-11-22, 7:19 PM: decision page picks (https://bclark10121-cloud.github.io/bc-decisions/2026-11-22-tiny-titans-v070/). New teams: Dune City Scorpions, Glacier Point Foxes, Pine Ridge Badgers and Lantern Bay Lobsters. Aim arc: dotted arc and landing ring. Star marker: a gold star over the helmet. Names: Titan Tokens, Dynasty (the long mode, not Career), Coach's call and Quick game.
 - 2026-11-22, 7:08 PM: "go" on the v0.7.0 release plan. The 13 judgment calls in its section 11 stand as written.
 - 2026-11-22: Asked for a review of Retro Bowl's features to make this game better. "add all your suggestions to the next release": ideas 16 to 27 are the v0.7.0 scope.
 - 2026-11-22: "One big v0.7.0", not three waves.
