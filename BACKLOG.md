@@ -121,7 +121,7 @@ Updated 2026-11-22 for the v0.7.0 scope (live version 0.6.4). BC decides the ord
   - Needs work (details asked): overall feel of running, passing and tackling.
   - All judgment calls from v0.4.0 to v0.6.0 confirmed.
 - v0.7.0 scope set (BC, 2026-11-22, 7:01 PM): all 12 ideas from the Retro Bowl review, ideas 16 to 27. See Next below.
-- Plan first (BC, 2026-11-22): Claude writes the v0.7.0 release plan. No build starts until BC says go.
+- Plan first (BC, 2026-11-22): the v0.7.0 release plan is written. No build starts until BC says go.
 
 ## Next: v0.7.0 (BC, 2026-11-22: "add all your suggestions to the next release")
 
@@ -156,7 +156,8 @@ Not in v0.7.0, still for BC to pick: penalties (idea 1) and the 7 on 7 playbook 
 
 Open before the build:
 
-- The v0.7.0 release plan, for BC's go.
+- BC's go on the v0.7.0 release plan (`PLAN_v0.7.0.md` in the private source, written 2026-11-22). It lists 13 judgment calls for BC to confirm.
+- One decision page after the go (G0.16): the 4 new teams, the aim arc, the star ring and the working names.
 - BC's details on the feel of running, passing and tackling (2026-11-19). Ideas 16 and 17 are the first answer to it.
 - Override row 11 in `STANDARDS_OVERRIDES.md` (G4.20) is Proposed until BC approves it.
 - Working names for BC to confirm: Career (the mode), Titan Tokens (the currency), Coach's call (the cards), Quick game (the mode).
