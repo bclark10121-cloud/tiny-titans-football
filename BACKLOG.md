@@ -1,8 +1,17 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-22 for the v0.7.0 scope (live version 0.6.4). BC decides the order.
+Updated 2026-11-22 for v0.7.0. BC decides the order.
 
 ## Done
+
+### v0.7.0 (2026-11-22: Quick game and the kit update)
+
+- Quick game mode (idea 19, from the Retro Bowl review, BC's pick for the one-hour scope). Offense only. Your drives start at your own 25. The other team's drives are simulated and shown as one line. Two halves, no kickoffs, no punts played, a tie stands. About 5 minutes at the default quarter length.
+- Sim this week on the Season screen, with a second press. It counts in the standings only.
+- Shared kit 1.15.0 to 1.27.0. Full screen by default in the browser (G5.11). No 60 frame cap: up to 120 frames a second (G6.20). 1080p and wider screens edge to edge (G6.21).
+- Camera, turning and leaning ease the same at 30, 60 and 120 frames a second. New `tests/fps_check.gd`.
+- Two models from this release (G0.17): Fable 5.2 plans and checks, Opus 5.5 helpers build.
+- Banked for later on the branch `ttf-dynasty-rules`: the Dynasty rules (4,282 checks). Not in this build.
 
 - v0.6.4 (2026-11-19): Godot 4.7.2 (G6.19), no change to play. BC's Needs work on running, passing and tackling waits for his details.
 
@@ -124,7 +133,7 @@ Updated 2026-11-22 for the v0.7.0 scope (live version 0.6.4). BC decides the ord
 - Go (BC, 2026-11-22, 7:08 PM): "go" on the v0.7.0 release plan (`PLAN_v0.7.0.md`), with its 13 judgment calls as written. The build is under way, piece 1 first (kit 1.27.0).
 - Scope cut (BC, 2026-11-22, 7:57 PM): v0.7.0 is the kit update plus Quick game mode and Sim this week. See Next below.
 
-## Next: v0.7.0 (scope cut by BC, 2026-11-22, 7:57 PM: "cut down the scope to only 1 hour")
+## Next: after v0.7.0 (v0.7.0 shipped 2026-11-22 with the scope BC cut at 7:57 PM: "cut down the scope to only 1 hour")
 
 BC first put all 12 Retro Bowl review ideas in v0.7.0, then cut the release to about one hour of work and picked Quick game mode to go with the kit update.
 
@@ -146,6 +155,8 @@ After v0.7.0, BC picks the order:
 Open:
 
 - BC's details on the feel of running, passing and tackling (2026-11-19).
+- Quick game follow-ups from v0.7.0: the scoreboard still says Q1 to Q4 in a Quick game (halves would read better). A season finished only with Sim this week still earns the season achievements. `tests/pad_test.py` and `tests/orient_test.py` cover the new screens and have not been run. The Quick game end screen has not been seen in a browser.
+- No fresh review (G7.14) ran for v0.7.0, to save tokens (BC, 2026-11-22, 8:39 PM).
 - Override row 11 in `STANDARDS_OVERRIDES.md` (G4.20) stays Proposed until BC approves it. It matters only once Dynasty ships.
 
 ## Asked for by BC, not built yet
@@ -207,6 +218,7 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 ## Decisions from BC
 
+- 2026-11-22, 8:39 PM: "finish the next change and add the rest to backlog when i have enough tokens to finish". v0.7.0 ships with Quick game. Everything else waits in Next. Yes to cloning game-signing for this APK.
 - 2026-11-22, 7:57 PM: "cut down the scope to only 1 hour". Picked Quick game mode to ship with the kit update. The other ideas move to later releases.
 - 2026-11-22, 7:19 PM: decision page picks (https://bclark10121-cloud.github.io/bc-decisions/2026-11-22-tiny-titans-v070/). New teams: Dune City Scorpions, Glacier Point Foxes, Pine Ridge Badgers and Lantern Bay Lobsters. Aim arc: dotted arc and landing ring. Star marker: a gold star over the helmet. Names: Titan Tokens, Dynasty (the long mode, not Career), Coach's call and Quick game.
 - 2026-11-22, 7:08 PM: "go" on the v0.7.0 release plan. The 13 judgment calls in its section 11 stand as written.
