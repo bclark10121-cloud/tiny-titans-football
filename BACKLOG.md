@@ -1,6 +1,6 @@
 # Tiny Titans Football: backlog
 
-Updated 2026-11-18 for v0.6.2. BC decides the order.
+Updated 2026-11-22 for the v0.7.0 scope (live version 0.6.4). BC decides the order.
 
 ## Done
 
@@ -115,19 +115,51 @@ Updated 2026-11-18 for v0.6.2. BC decides the order.
 
 ## Now
 
+- Staged for the next release (BC, 2026-11-19, 10:32 PM): full screen by default in the browser (G5.11, standards 19b). Pull kit 1.17.0 with `sync_common.sh`: the game goes full screen on the first tap, click or key press, and remembers when the player turns it off. Test: `tests/common` browser run, first click sets full screen. Also take G6.20 (120 frames a second) at the same release.
 - Playtest sweep results (BC, 2026-11-19, 8:59 PM):
   - Good: code-built players and celebrations, Stage 3 music level, upright camera.
   - Needs work (details asked): overall feel of running, passing and tackling.
   - All judgment calls from v0.4.0 to v0.6.0 confirmed.
-- Then BC picks from Next below.
+- v0.7.0 scope set (BC, 2026-11-22, 7:01 PM): all 12 ideas from the Retro Bowl review, ideas 16 to 27. See Next below.
+- Plan first (BC, 2026-11-22): Claude writes the v0.7.0 release plan. No build starts until BC says go.
 
-## Next (v0.6.0, BC picks)
+## Next: v0.7.0 (BC, 2026-11-22: "add all your suggestions to the next release")
 
-BC's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 yet. The top candidates:
+One release with all 12 ideas from the Retro Bowl review (BC's pick: "One big v0.7.0", over three waves). Retro Bowl is the reference for structure only (G4.8). Every name, team, player, text and picture is our own (pillar 4).
 
-1. Penalties (idea 1).
-2. A 7 on 7 playbook (idea 13).
-3. Release 7 standards update for this game (PLAN.md): kit 1.12.0, achievements, stats, remapping and the rest.
+On the field:
+
+1. Drag-to-aim passing (idea 16).
+2. Swipe moves and a truck move (idea 17).
+3. Dynamic difficulty (idea 18).
+4. Quick game mode and Sim this week (idea 19).
+5. Limited audibles (idea 20).
+
+Between games, in a new Career mode:
+
+6. Star players with ratings and XP (idea 21).
+7. Credits, fans and morale (idea 22).
+8. Coach's call cards (idea 23).
+9. Facilities and coordinators (idea 24). Two buildings, no rehab centre (BC's pick).
+10. Off-season draft (idea 25).
+11. Career history: awards, a hall of fame and a champions list (idea 26).
+12. Bigger league (idea 27).
+
+Also due at this release, from the standards:
+
+- Full screen by default in the browser, 120 frames a second (G6.20) and 1080p and wider edge to edge (G6.21), with the newest kit.
+- Two models (G0.17) and the desktop app as the chat's home (G0.18).
+- Trophies for season results, daily goals and player level (G4.18 to G4.20 rollout table).
+- The talk box (G5.20) arrives with the Coach's call cards, the game's first NPC text.
+
+Not in v0.7.0, still for BC to pick: penalties (idea 1) and the 7 on 7 playbook (idea 13).
+
+Open before the build:
+
+- The v0.7.0 release plan, for BC's go.
+- BC's details on the feel of running, passing and tackling (2026-11-19). Ideas 16 and 17 are the first answer to it.
+- Override row 11 in `STANDARDS_OVERRIDES.md` (G4.20) is Proposed until BC approves it.
+- Working names for BC to confirm: Career (the mode), Titan Tokens (the currency), Coach's call (the cards), Quick game (the mode).
 
 ## Asked for by BC, not built yet
 
@@ -153,6 +185,21 @@ BC's v0.2.0 and v0.3.0 playtest notes come first. Nothing is planned for v0.4.0 
 14. Open receiver colours. Each receiver's button label turns green when open and red when covered. A help for new players.
 15. Box score at the end of the game: passing and rushing yards, completions and the longest play. Today the end screen shows total yards and turnovers.
 
+From the Retro Bowl review (2026-11-22). All 12 are in v0.7.0 (BC's pick). Sizes are estimates.
+
+16. Drag-to-aim passing (M). A third passing style beside the receiver buttons and Auto pass. Pull back, see the arc, release to throw to a spot ahead of the receiver. The right stick aims on a controller.
+17. Swipe moves and a truck move (S to M). On touch, swipe up or down to juke and forward to dive. A new truck move lowers the shoulder through a tackler, on every device.
+18. Dynamic difficulty (S). A fourth choice beside Easy, Normal and Hard. Wins make the computer tougher. Losses ease it.
+19. Quick game mode (M). Offense only. The defense is simulated and shown as a one-line result. A full game in about 5 minutes. The season screen gets Sim this week.
+20. Limited audibles (S). The quarterback's rating sets how many audibles a half allows. Career mode only. Needs idea 21.
+21. Star players with ratings and XP (L). A few named, fictional stars per team who level up with play.
+22. Credits, fans and morale (M). One currency earned from wins (working name Titan Tokens). A bigger fan base pays more per win. Low morale means more fumbles.
+23. Coach's call cards (S to M). One-tap choices between games, such as who to praise after a win. Shown in the talk box (G5.20).
+24. Facilities and coordinators (M). Two buildings to upgrade: a stadium for fans and a training centre for XP. Two coordinators with star ratings and traits. No rehab centre: this game has no injuries (calm level, G4.1).
+25. Off-season draft (L). Three rounds. Scouting shows a rookie's potential.
+26. Career history (M). Many seasons in one career. Player awards each season, a hall of fame the player picks and a champions list. Personal records only (G4.4).
+27. Bigger league (M). More teams, a longer season and a playoff bracket. Today: 4 teams, 6 weeks and a 2-team Title Game.
+
 ## Unfinished standards items (2026-11-15)
 
 From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on a real device. Each line comes off when it is done. BC picks when.
@@ -173,6 +220,12 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 ## Decisions from BC
 
+- 2026-11-22: Asked for a review of Retro Bowl's features to make this game better. "add all your suggestions to the next release": ideas 16 to 27 are the v0.7.0 scope.
+- 2026-11-22: "One big v0.7.0", not three waves.
+- 2026-11-22: Drop the rehab centre. No injuries, no change to the calm level.
+- 2026-11-22: Upgrades raise real ratings in Career mode only. Exhibition and Season stay even. Logged as Proposed override row 11 (G4.20) for BC to approve.
+- 2026-11-22: Plan first. BC says go before any build.
+- 2026-11-22: The between-games layer (ideas 21 to 27) adds to the 2026-11-14 focus on on-field play. Pillar 1 (call it, then run it) is unchanged: Career is a mode around the same games.
 - 2026-11-16: "yes" to fixing the silent sound effects found in Tiny Tailwind wherever the same route was missing. Shipped here as v0.3.5.
 - 2026-11-14: Focus on on-field play. Godot for Android and browser. Angled camera with low-poly 3D.
 - 2026-11-14: 11 on 11. Arcade feel. Use Patch.gg.
