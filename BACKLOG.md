@@ -122,43 +122,31 @@ Updated 2026-11-22 for the v0.7.0 scope (live version 0.6.4). BC decides the ord
   - All judgment calls from v0.4.0 to v0.6.0 confirmed.
 - v0.7.0 scope set (BC, 2026-11-22, 7:01 PM): all 12 ideas from the Retro Bowl review, ideas 16 to 27. See Next below.
 - Go (BC, 2026-11-22, 7:08 PM): "go" on the v0.7.0 release plan (`PLAN_v0.7.0.md`), with its 13 judgment calls as written. The build is under way, piece 1 first (kit 1.27.0).
+- Scope cut (BC, 2026-11-22, 7:57 PM): v0.7.0 is the kit update plus Quick game mode and Sim this week. See Next below.
 
-## Next: v0.7.0 (BC, 2026-11-22: "add all your suggestions to the next release")
+## Next: v0.7.0 (scope cut by BC, 2026-11-22, 7:57 PM: "cut down the scope to only 1 hour")
 
-One release with all 12 ideas from the Retro Bowl review (BC's pick: "One big v0.7.0", over three waves). Retro Bowl is the reference for structure only (G4.8). Every name, team, player, text and picture is our own (pillar 4).
+BC first put all 12 Retro Bowl review ideas in v0.7.0, then cut the release to about one hour of work and picked Quick game mode to go with the kit update.
 
-On the field:
+In v0.7.0:
 
-1. Drag-to-aim passing (idea 16).
-2. Swipe moves and a truck move (idea 17).
-3. Dynamic difficulty (idea 18).
-4. Quick game mode and Sim this week (idea 19).
-5. Limited audibles (idea 20).
+1. Quick game mode and Sim this week (idea 19).
+2. The newest kit (1.27.0), full screen by default in the browser (G5.11), 120 frames a second (G6.20) and 1080p and wider screens edge to edge (G6.21).
+3. Two models (G0.17), the desktop app as the chat's home (G0.18) and the fresh review (G7.14).
 
-Between games, in a new Dynasty mode (working name Career until BC's pick on 2026-11-22):
+After v0.7.0, BC picks the order:
 
-6. Star players with ratings and XP (idea 21).
-7. Credits, fans and morale (idea 22).
-8. Coach's call cards (idea 23).
-9. Facilities and coordinators (idea 24). Two buildings, no rehab centre (BC's pick).
-10. Off-season draft (idea 25).
-11. Dynasty history: awards, a hall of fame and a champions list (idea 26).
-12. Bigger league (idea 27).
+- Dynamic difficulty (idea 18). Brief written: `briefs/v0.7.0/03_dynamic_difficulty.md`.
+- Aim passing (idea 16). Brief written. BC's pick: dotted arc and landing ring.
+- Swipe moves and the truck move (idea 17). Brief written.
+- Dynasty mode (ideas 20 to 27). The rules are built and tested (`TTCareer`, 4,274 checks) and banked on the branch `ttf-dynasty-rules` in game-studio. Still to build: the screens, the star ratings on the field and the Coach's call cards in the talk box. BC's picks stand: Dynasty, Titan Tokens, Coach's call, a gold star over the helmet and the four new teams.
+- Still due from the standards at a later release: daily goals (G4.19), player level (G4.20) and trophies for season results (G4.18).
+- Penalties (idea 1) and the 7 on 7 playbook (idea 13).
 
-Also due at this release, from the standards:
+Open:
 
-- Full screen by default in the browser, 120 frames a second (G6.20) and 1080p and wider edge to edge (G6.21), with the newest kit.
-- Two models (G0.17) and the desktop app as the chat's home (G0.18).
-- Trophies for season results, daily goals and player level (G4.18 to G4.20 rollout table).
-- The talk box (G5.20) arrives with the Coach's call cards, the game's first NPC text.
-
-Not in v0.7.0, still for BC to pick: penalties (idea 1) and the 7 on 7 playbook (idea 13).
-
-Open before the build:
-
-- BC's details on the feel of running, passing and tackling (2026-11-19). Ideas 16 and 17 are the first answer to it.
-- Override row 11 in `STANDARDS_OVERRIDES.md` (G4.20) is Proposed until BC approves it.
-- Names picked (BC, 2026-11-22): Dynasty (the long mode), Titan Tokens, Coach's call and Quick game.
+- BC's details on the feel of running, passing and tackling (2026-11-19).
+- Override row 11 in `STANDARDS_OVERRIDES.md` (G4.20) stays Proposed until BC approves it. It matters only once Dynasty ships.
 
 ## Asked for by BC, not built yet
 
@@ -184,7 +172,7 @@ Open before the build:
 14. Open receiver colours. Each receiver's button label turns green when open and red when covered. A help for new players.
 15. Box score at the end of the game: passing and rushing yards, completions and the longest play. Today the end screen shows total yards and turnovers.
 
-From the Retro Bowl review (2026-11-22). All 12 are in v0.7.0 (BC's pick). Sizes are estimates.
+From the Retro Bowl review (2026-11-22). Idea 19 is in v0.7.0. The rest wait for BC's pick. Sizes are estimates.
 
 16. Drag-to-aim passing (M). A third passing style beside the receiver buttons and Auto pass. Pull back, see the arc, release to throw to a spot ahead of the receiver. The right stick aims on a controller.
 17. Swipe moves and a truck move (S to M). On touch, swipe up or down to juke and forward to dive. A new truck move lowers the shoulder through a tackler, on every device.
@@ -219,6 +207,7 @@ From the Open items in `STANDARDS_OVERRIDES.md`, plus what has not been tried on
 
 ## Decisions from BC
 
+- 2026-11-22, 7:57 PM: "cut down the scope to only 1 hour". Picked Quick game mode to ship with the kit update. The other ideas move to later releases.
 - 2026-11-22, 7:19 PM: decision page picks (https://bclark10121-cloud.github.io/bc-decisions/2026-11-22-tiny-titans-v070/). New teams: Dune City Scorpions, Glacier Point Foxes, Pine Ridge Badgers and Lantern Bay Lobsters. Aim arc: dotted arc and landing ring. Star marker: a gold star over the helmet. Names: Titan Tokens, Dynasty (the long mode, not Career), Coach's call and Quick game.
 - 2026-11-22, 7:08 PM: "go" on the v0.7.0 release plan. The 13 judgment calls in its section 11 stand as written.
 - 2026-11-22: Asked for a review of Retro Bowl's features to make this game better. "add all your suggestions to the next release": ideas 16 to 27 are the v0.7.0 scope.
